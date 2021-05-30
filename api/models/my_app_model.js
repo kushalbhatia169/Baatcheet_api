@@ -25,7 +25,7 @@ My_App.methods.setPassword = (password) =>{
     }
 };
 
-My_App.methods.validPassword = (password, salt, user_hash) =>{  
+My_App.methods.validPassword = async(password, salt, user_hash) =>{  
     const hash = crypto.pbkdf2Sync(password, salt, 10000, 512, 'sha512').toString('hex');
     return user_hash === hash;
 };

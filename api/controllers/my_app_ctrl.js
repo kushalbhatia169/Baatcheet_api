@@ -1,6 +1,54 @@
 const User = require('../models/my_app_model')
 
+checkAuthenicator = async(req, res) =>{
+    // check for basic auth header
+    if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
+        return res.status(401).json({ message: 'Missing Authorization Header' });
+    }
+
+    // verify auth credentials
+    const base64Credentials =  req.headers.authorization.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+    const [username, password] = credentials.split(':');
+    const user = await authenticate({ username, password });
+    if (!user) {
+        return false;
+    }
+    return user;
+}
+
+const authenticate = async({ username, password }) =>{
+    const user = await User.findOne({username: username}, (err, user) => {
+        if (err || !user) {
+            return false;
+        }
+    });
+    const myPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(()=>{
+            const isValidate =  user.validPassword(password, user.salt, user.hash);
+            console.log(isValidate)
+            if(isValidate){
+                console.log(user)
+                return user;
+            }
+            else{
+                return false;
+            }
+          }
+          );
+        }, 1000);
+        reject();
+    });
+    myPromise.catch(()=>{})  
+}
+
 userLogin = async(req, res) =>{
+    const checkUser = await checkAuthenicator(req, res);
+    console.log(checkUser)
+    if (!checkUser) {
+        //return res.status(400).json({ success: false, error: err })
+    }
     const body = req.body;
     if (!body) {
         return res.status(400).json({
