@@ -3,8 +3,10 @@ const User = require('../models/my_app_model')
 
 checkAuthenicator = async(req, res) =>{
     // check for basic auth header
+    //console.log(req.headers.authorization)
     if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
-        return res.status(401).json({ message: 'Missing Authorization Header' });
+        // return res.status(401).json({ message: 'Missing Authorization Header' });
+        return false;
     }
 
     // verify auth credentials
@@ -27,31 +29,35 @@ checkAuthenicator = async(req, res) =>{
 
 const authenticate = async({ username, password }) =>{
     const user = await User.findOne({username: username}, (err, user) => {
+        console.log(user)
         if (err) {
-            return res.status(400).json({ success: false, error: err })
+            return false;
+            // return res.status(400).json({ success: false, error: err })
         }
         if (!user) {
-            return res
-                .status(404)
-                .json({ success: false, error: `User not found` })
+            return false;
+            // return res
+            //     .status(404)
+            //     .json({ success: false, error: `User not found` })
         }
     });
     const validate = {};
-    user
-        .validPassword(password, user.salt, user.hash)
-        .then((isValidate)=>{
+    if(user){
+        user
+            .validPassword(password, user.salt, user.hash)
+            .then((isValidate)=>{
 
-            if(isValidate){
-                validate.isValidate = true;
-                validate.user = user;
-            }
-            else{
-                validate.isValidate = false;
-                validate.user = null;
-            }
-        })
-        .catch(err => console.log(err))
-    
+                if(isValidate){
+                    validate.isValidate = true;
+                    validate.user = user;
+                }
+                else{
+                    validate.isValidate = false;
+                    validate.user = null;
+                }
+            })
+            .catch(err => console.log(err))
+    }
     return validate;
 }
 
@@ -59,33 +65,14 @@ userLogin = async(req, res) =>{
     const checkUser = await checkAuthenicator(req, res)
         .then((checkUser)=>{
             if (!checkUser) {
-                return res.status(400).json({ success: false, error: `Invalid UserName or Password from here` })
+                return res.status(400).json({ success: false, error: `Invalid or missing credentials` })
+                //return false;
             }
             return checkUser;
         })
     console.log(checkUser?.username, checkUser?.phoneNumber, checkUser?.email);
-    const body = req.body;
-    if (!body) {
-        return res.status(400).json({
-            success: false,
-            error: 'You must provide a User',
-        })
-    }
     if(checkUser?.username){
         console.log(checkUser?.username, checkUser?.phoneNumber, checkUser?.email);
-        // await User.findOne({ username: body.username}, (err, user) => {
-        //     if (err) {
-        //         return res.status(400).json({ success: false, error: err })
-        //     }
-        //     if (!user) {
-        //         return res
-        //             .status(404)
-        //             .json({ success: false, error: `User not found` })
-        //     }
-        //     user
-        //         .validPassword(body.password, user.salt, user.hash)
-        //         .then((isValidate)=>{
-        //             if(isValidate){
         const user = checkUser;
         const data = user.toAuthJSON(user);
         const { token } = data;
@@ -98,19 +85,18 @@ userLogin = async(req, res) =>{
                 })
             })
             .catch((e)=>{console.error('An error occured',e.message)})
-        // }
-        //     else{
-        //         return res
-        //             .status(404)
-        //             .json({ success: false, error: `Invalid UserName or Password` })
-        //     }
-        // })
-        // .catch(err => console.log(err))
-        // }).catch(err => console.log(err))
     }
 }
 
-createUser = (req, res) => {
+createUser = async(req, res) => {
+    // if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
+    //     return res.status(401).json({ message: 'Missing Authorization Header' });
+    //     //return false;
+    // }
+    // verify auth credentials
+    const base64Credentials =  req.headers.authorization.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+    const [username, password] = credentials.split(':');
     const body = req.body;
     if (!body) {
         return res.status(400).json({
@@ -118,49 +104,66 @@ createUser = (req, res) => {
             error: 'You must provide a User',
         })
     }
-    User.findOne({ username: body.username }, (user) => {
+
+    if(!username && !password){
+        return res.status(401).json({ message: 'Missing Authorization Header' });
+    }
+    if(username !== body.username){
+        return res.status(400).json({
+            success: false,
+            error: 'body and base auth username does not match',
+        })
+    }
+    const user = await User.findOne({ username: username }, (user) => {
+        console.log(username, user)
         if (user) {
+            console.log('here')
             return res.status(404).json({
                 err,
                 message: 'User already exist!',
             })
+            
         }
-        else {
-            if (!body) {
-                return res.status(400).json({
-                    success: false,
-                    error: 'You must provide a User',
-                })
-            }
-
-            const user = new User(body);
-
-            if (!user) {
-                return res.status(400).json({ success: false, error: err })
-            }
-
-            const password = user.setPassword(body.password);
-            const data = user.toAuthJSON(user);
-            user.hash = password.hash;
-            user.salt = password.salt;
-            user.token = data.token;
-            user
-                .save()
-                .then(() => {
-                    return res.status(201).json({
-                        success: true,
-                        data: data, 
-                        message: 'User created!',
-                    })
-                })
-                .catch(error => {
-                    return res.status(400).json({
-                        error,
-                        message: 'User not created!',
-                    })
-                })
+        if (!body) {
+            return res.status(400).json({
+                success: false,
+                error: 'You must provide a User',
+            })
         }
     })
+
+    if(!user){
+        const user = new User(body);
+
+        if (!user) {
+            return res.status(400).json({ success: false, error: err })
+        }
+
+        const user_password = user.setPassword(password);
+        const data = user.toAuthJSON(user);
+        user.hash = user_password.hash;
+        user.salt = user_password.salt;
+        user.token = data.token;
+        user
+            .save()
+            .then(() => {
+                return res.status(201).json({
+                    success: true,
+                    data: data, 
+                    message: 'User created!',
+                })
+            })
+            .catch(error => {
+                return res.status(400).json({
+                    error,
+                    message: 'User not created!',
+                })
+            })
+    } else{
+        return res.status(404).json({
+            message: 'User already exist!',
+        })
+    }
 }
 
 updateUser = async (req, res) => {
