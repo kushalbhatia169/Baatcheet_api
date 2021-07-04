@@ -15,7 +15,7 @@ checkAuthenicator = async(req, res) =>{
     const [username, password] = credentials.split(':');
     const user = await authenticate({ username, password })
         .then((user)=>{
-            const { isValidate,user:userData} = user
+            const { isValidate, user : userData } = user
             if (!isValidate) {
                 return userData;
             }
@@ -27,7 +27,7 @@ checkAuthenicator = async(req, res) =>{
     return user;
 }
 
-const authenticate = async({ username, password }) =>{
+const authenticate = async({ username, password }) => {
     const user = await User.findOne({username: username}, (err, user) => {
         console.log(user)
         if (err) {
@@ -41,17 +41,17 @@ const authenticate = async({ username, password }) =>{
             //     .json({ success: false, error: `User not found` })
         }
     });
+
     const validate = {};
     if(user){
         user
             .validPassword(password, user.salt, user.hash)
             .then((isValidate)=>{
-
-                if(isValidate){
+                if(isValidate) {
                     validate.isValidate = true;
                     validate.user = user;
                 }
-                else{
+                else {
                     validate.isValidate = false;
                     validate.user = null;
                 }
@@ -61,7 +61,7 @@ const authenticate = async({ username, password }) =>{
     return validate;
 }
 
-userLogin = async(req, res) =>{
+userLogin = async(req, res) => {
     const checkUser = await checkAuthenicator(req, res)
         .then((checkUser)=>{
             if (!checkUser) {
@@ -104,11 +104,10 @@ createUser = async(req, res) => {
             error: 'You must provide a User',
         })
     }
-
-    if(!username && !password){
+    if(!username && !password) {
         return res.status(401).json({ message: 'Missing Authorization Header' });
     }
-    if(username !== body.username){
+    if(username !== body.username) {
         return res.status(400).json({
             success: false,
             error: 'body and base auth username does not match',
