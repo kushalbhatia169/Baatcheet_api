@@ -13,6 +13,7 @@ checkAuthenicator = async(req, res) =>{
     const base64Credentials =  req.headers.authorization.split(' ')[1];
     const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
     const [username, password] = credentials.split(':');
+    // console.log(username, password);
     const user = await authenticate({ username, password })
         .then((user)=>{
             const { isValidate, user : userData } = user
@@ -29,16 +30,12 @@ checkAuthenicator = async(req, res) =>{
 
 const authenticate = async({ username, password }) => {
     const user = await User.findOne({username: username}, (err, user) => {
-        console.log(user)
+        // console.log(user)
         if (err) {
             return false;
-            // return res.status(400).json({ success: false, error: err })
         }
         if (!user) {
             return false;
-            // return res
-            //     .status(404)
-            //     .json({ success: false, error: `User not found` })
         }
     });
 
@@ -66,13 +63,12 @@ userLogin = async(req, res) => {
         .then((checkUser)=>{
             if (!checkUser) {
                 return res.status(400).json({ success: false, error: `Invalid or missing credentials` })
-                //return false;
             }
             return checkUser;
         })
-    console.log(checkUser?.username, checkUser?.phoneNumber, checkUser?.email);
+    //console.log(checkUser?.username, checkUser?.phoneNumber, checkUser?.email);
     if(checkUser?.username){
-        console.log(checkUser?.username, checkUser?.phoneNumber, checkUser?.email);
+        //console.log(checkUser?.username, checkUser?.phoneNumber, checkUser?.email);
         const user = checkUser;
         const data = user.toAuthJSON(user);
         const { token } = data;
@@ -89,11 +85,6 @@ userLogin = async(req, res) => {
 }
 
 createUser = async(req, res) => {
-    // if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
-    //     return res.status(401).json({ message: 'Missing Authorization Header' });
-    //     //return false;
-    // }
-    // verify auth credentials
     const base64Credentials =  req.headers.authorization.split(' ')[1];
     const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
     const [username, password] = credentials.split(':');
@@ -114,9 +105,9 @@ createUser = async(req, res) => {
         })
     }
     const user = await User.findOne({ username: username }, (user) => {
-        console.log(username, user)
+        //console.log(username, user)
         if (user) {
-            console.log('here')
+            //console.log('here')
             return res.status(404).json({
                 err,
                 message: 'User already exist!',
@@ -166,56 +157,89 @@ createUser = async(req, res) => {
 }
 
 updateUser = async (req, res) => {
-    const body = req.body;
-
-    if (!body) {
-        return res.status(400).json({
-            success: false,
-            error: 'You must provide a body to update',
+    const checkUser = await checkAuthenicator(req, res)
+        .then((checkUser)=>{
+            if (!checkUser) {
+                return res.status(400).json({ success: false, error: `Invalid or missing credentials` })
+            }
+            return checkUser;
         })
-    }
+    //console.log(checkUser?.username, checkUser?.phoneNumber, checkUser?.email);
+    if(checkUser?.username) {
+        //console.log(checkUser?.username, checkUser?.phoneNumber, checkUser?.email);
+        const body = req.body;
 
-    User.findOne({ _id: req.params.id }, (err, user) => {
-        if (err) {
-            return res.status(404).json({
-                err,
-                message: 'User not found!',
+        if (!body) {
+            return res.status(400).json({
+                success: false,
+                error: 'You must provide a body to update',
             })
         }
-        user.phoneNumber = body.phoneNumber
-        user.username = body.username
-        user.email = body.email
-        user
-            .save()
-            .then(() => {
-                return res.status(200).json({
-                    success: true,
-                    id: user._id,
-                    message: 'User updated!',
-                })
-            })
-            .catch(error => {
+
+        User.findOne({ _id: req.params.id }, (err, user) => {
+            if (err) {
                 return res.status(404).json({
-                    error,
-                    message: 'User not updated!',
+                    err,
+                    message: 'User not found!',
                 })
-            })
-    })
+            }
+            const isTokenExpired = user.checkExpireJWT(body.token);
+            if(isTokenExpired){
+                return res.status(404).json({
+                    err,
+                    message: 'session expired',
+                })
+            }
+            if (body.token !== user.token) {
+                return res.status(404).json({
+                    err,
+                    message: 'Invalid token',
+                })
+            }
+            user.phoneNumber = body.phoneNumber
+            user.username = body.username
+            user.email = body.email
+            user
+                .save()
+                .then(() => {
+                    return res.status(200).json({
+                        success: true,
+                        id: user._id,
+                        message: 'User updated!',
+                    })
+                })
+                .catch(error => {
+                    return res.status(404).json({
+                        error,
+                        message: 'User not updated!',
+                    })
+                })
+        })
+    }
 }
 
 deleteUser = async (req, res) => {
-    const body = req.body;
-    await User.findOneAndDelete({ _id: req.params.id }, (err, user) => {
-        if (err) {
-            return res.status(400).json({ success: false, error: err })
-        }
-        if (!user) {
-            return res
-                .status(404)
-                .json({ success: false, error: `User not found` })
-        }
-        return res.status(200).json({ success: true, data: user })
-    }).catch(err => console.log(err))
+    const checkUser = await checkAuthenicator(req, res)
+        .then((checkUser)=>{
+            if (!checkUser) {
+                return res.status(400).json({ success: false, error: `Invalid or missing credentials` })
+            }
+            return checkUser;
+        })
+    //console.log(checkUser?.username, checkUser?.phoneNumber, checkUser?.email);
+    if(checkUser?.username) {
+        await User.findOneAndDelete({ _id: req.params.id }, (err, user) => {
+            if (err) {
+                return res.status(400).json({ success: false, error: err })
+            }
+            if (!user) {
+                return res
+                    .status(404)
+                    .json({ success: false, error: `User not found` })
+            }
+            return res.status(200).json({ success: true, data: user })
+        }).catch(err => console.log(err))
+    }
 }
 
 getUserById = async (req, res) => {
