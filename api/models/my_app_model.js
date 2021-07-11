@@ -58,7 +58,7 @@ My_App.methods.toAuthJSON = (user) =>{
     };
 };
 
-My_App.methods.checkExpireJWT = (token) => {
+My_App.methods.checkExpireJWT = async (token) => {
     const today = new Date();
     const exp = new Date(today);
     exp.setDate(today.getDate() + 60);
