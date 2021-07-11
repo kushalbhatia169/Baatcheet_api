@@ -215,8 +215,10 @@ updateUser = async (req, res) => {
                                 message: 'User not updated!',
                             })
                         })
-                }).catch(err => console.log(err)) 
-        }).catch(err => console.log(err)) 
+                })
+                .catch(err => console.log(err)) 
+        })
+        .catch(err => console.log(err)) 
     }
    
 }
@@ -249,8 +251,10 @@ deleteUser = async (req, res) => {
                             .json({ success: false, error: `User not found` })
                     }
                     return res.status(200).json({ success: true, data: user })
-                }).catch(err => console.log(err))
-            }).catch(err => console.log(err)) 
+                })
+                .catch(err => console.log(err))
+            })
+            .catch(err => console.log(err)) 
     }
 }
 
@@ -318,8 +322,10 @@ getUserById = async (req, res) => {
                         email : user.email,
                     }
                     return res.status(200).json({ success: true, data: data })
-                }).catch(err => console.log(err))
-        }).catch(err => console.log(err)) 
+                })
+                .catch(err => console.log(err))
+        })
+        .catch(err => console.log(err)) 
     }
 }
 
@@ -350,8 +356,10 @@ getUsers = async ( res) => {
                         })
                     }
                     return res.status(200).json({ success: true, data: users })
-                }).catch(err => console.log(err)) 
-        }).catch(err => console.log(err)) 
+                })
+                .catch(err => console.log(err)) 
+        })
+        .catch(err => console.log(err)) 
     }
 }
 
