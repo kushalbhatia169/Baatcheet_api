@@ -6,5 +6,5 @@ const uuid = require("uuid"),
     return JWT_SECRET;
 
   };
-
+  
 module.exports = secret;

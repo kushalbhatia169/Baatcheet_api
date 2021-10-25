@@ -5,8 +5,9 @@
         "node": true,
         "es6": true
     },
+    "parser": "@babel/eslint-parser",
     "parserOptions": {
-        "ecmaVersion": 2017
+        "ecmaVersion": 2018
     },
     "rules": {
         "indent": ["warn", 2],
