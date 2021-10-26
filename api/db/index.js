@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 mongoose
-  .connect('mongodb://127.0.0.1:27017/my-app', { useNewUrlParser: true, useUnifiedTopology: true, 
+  .connect('mongodb://127.0.0.1:27017/users', { useNewUrlParser: true, useUnifiedTopology: true, 
     useCreateIndex: true })
   .catch(e => {
     console.error('Connection error', e.message)
@@ -9,4 +9,4 @@ mongoose
 
 const db = mongoose.connection
 
-module.exports = db
+module.exports = db;
