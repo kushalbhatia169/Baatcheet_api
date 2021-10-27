@@ -1,12 +1,10 @@
 const mongoose = require('mongoose')
-
+const dbconfig = require('../db/db.config');
 mongoose
-  .connect('mongodb://127.0.0.1:27017/users', { useNewUrlParser: true, useUnifiedTopology: true, 
-    useCreateIndex: true })
+  .connect(`${dbconfig.DBSERVICE}://${dbconfig.DBPORT}/${dbconfig.DBNAME}`, {...dbconfig.DBPARAMS})
   .catch(e => {
     console.error('Connection error', e.message)
   })
 
 const db = mongoose.connection
-
 module.exports = db;

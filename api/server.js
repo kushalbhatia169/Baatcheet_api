@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser");
 const app = express(),
   port = 3000,
   cors = require('cors');
-  db = require('./db');
+  db = require('./models/index');
 require('dotenv').config({path: __dirname + '/.env'});
 const userRouter = require('./routes/router');
 const corsOptions = {

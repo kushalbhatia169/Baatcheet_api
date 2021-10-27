@@ -10,7 +10,7 @@ router.post('/login', async(req, res) => {
     const [username, password] = await checkAuthentication(req);
     //const body = req.body;
     if(!username && !password) {
-        return res.status(401).json({ message: 'Missing Authorization Header' });
+        return res.status(401).json({ success: false, message: 'Missing Authorization Header' });
     }
     console.log(username, password)
     try {
@@ -19,6 +19,7 @@ router.post('/login', async(req, res) => {
         console.log(status, 'status')
         if(status instanceof Error) {
             return res.status(400).json({
+                success: false,
                 error:status,
                 message: 'User not found!',
             })
@@ -40,8 +41,8 @@ router.post('/login', async(req, res) => {
             throw Error;
         }
     } catch (error) {
-        console.log(error)
         return res.status(400).json({
+            success: false,
             error,
             message: 'User not logged in!',
         })
@@ -56,7 +57,8 @@ router.post('/', async (req, res) => {
         console.log('status', status)
         if(status instanceof Error) {
             return res.status(400).json({
-            message: 'User not created!',
+                success: false,
+                message: 'User not created!',
           })
         }
         return res.status(201).json({
@@ -67,6 +69,7 @@ router.post('/', async (req, res) => {
     } catch (error) {
         console.log('error', error)
         return res.status(400).json({
+            success: false,
             error,
             message: 'User not created!',
         })
