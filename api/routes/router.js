@@ -3,20 +3,19 @@ const checkAuthentication = require("../utils/base64Auth")
 const My_app_Ctrl = require('../controllers/my_app_ctrl')
 const UserRegistration = require('../controllers/UserRegistration')
 const UserLogin = require('../controllers/userLogin')
+const UserUpdation = require('../controllers/UserUpdation')
 
 const router = express.Router()
 
 router.post('/login', async(req, res) => {
     const [username, password] = await checkAuthentication(req);
     //const body = req.body;
-    if(!username && !password) {
+    if(!username || !password) {
         return res.status(401).json({ success: false, message: 'Missing Authorization Header' });
     }
-    console.log(username, password)
     try {
         const userLogin = new UserLogin();
         const status = await userLogin.aunthenticateUser(username, password);
-        console.log(status, 'status')
         if(status instanceof Error) {
             return res.status(400).json({
                 success: false,
@@ -76,7 +75,36 @@ router.post('/', async (req, res) => {
     }
 })
 
-// router.put('/:id/update', My_app_Ctrl.updateUser)
+router.put('/:id/update', async(req, res)=>{
+    const userUpdation = new UserUpdation();
+    const id = req.params.id;
+    try {
+        const status = await userUpdation.updateUser(id, req);
+        if(status instanceof Error) {
+            return res.status(400).json({
+                success: false,
+                message: 'User not updated!',
+          })
+        }
+        if(status){
+            const {_id, username, phoneNumber, email} = status;
+            return res.status(201).json({
+                success: true,
+                data: {_id, username, phoneNumber, email},
+                message: 'User updated!',
+            })
+        }
+        else {
+            throw Error;
+        }
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            error,
+            message: 'User not updated!',
+        })
+    }
+})
 // router.delete('/:id/delete', My_app_Ctrl.deleteUser)
 // router.get('/:id', My_app_Ctrl.getUserById)
 // router.get('/users', My_app_Ctrl.getUsers)

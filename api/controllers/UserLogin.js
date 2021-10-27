@@ -17,17 +17,15 @@ class UserLogin {
         }
       })
       .then((user)=> {
-        const userData = (async() => {
+        return (async() => {
           const isPasswordValid = await validateHashPassword(password, user?.salt, user?.hash);
           if(!isPasswordValid) return new Error('incorrect user/password');
           const jwToken = await generateJWT(user);
-          console.log(jwToken)
           const result = {};
           result["x-auth-token"] = jwToken;
           result["user"] = user;
           return result;
         })();
-        return userData;
       })
       .catch((e)=>{
         return new Error(e.message);
