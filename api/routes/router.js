@@ -1,10 +1,9 @@
 const express = require('express')
 const checkAuthentication = require("../utils/base64Auth")
-const My_app_Ctrl = require('../controllers/my_app_ctrl')
 const UserRegistration = require('../controllers/UserRegistration')
 const UserLogin = require('../controllers/userLogin')
 const UserUpdation = require('../controllers/UserUpdation')
-
+const middleware = require("../middlewares");
 const router = express.Router()
 
 router.post('/login', async(req, res) => {
@@ -75,7 +74,7 @@ router.post('/', async (req, res) => {
     }
 })
 
-router.put('/:id/update', async(req, res)=>{
+router.put('/:id/update', middleware.isAuthorized, async(req, res)=>{
     const userUpdation = new UserUpdation();
     const id = req.params.id;
     try {
@@ -105,7 +104,7 @@ router.put('/:id/update', async(req, res)=>{
         })
     }
 })
-// router.delete('/:id/delete', My_app_Ctrl.deleteUser)
+// router.delete('/:id/delete',middleware.isAuthorized, My_app_Ctrl.deleteUser)
 // router.get('/:id', My_app_Ctrl.getUserById)
 // router.get('/users', My_app_Ctrl.getUsers)
 

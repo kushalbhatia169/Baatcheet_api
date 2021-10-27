@@ -30,7 +30,6 @@ const User = new Schema(
     },
     hash: String,
     salt: String,
-    token: String,
   },
   { timestamps: true },
 )

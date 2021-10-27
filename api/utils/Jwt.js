@@ -13,22 +13,8 @@ generateJWT = async(user) =>{
     username: user.username,
     exp: parseInt(exp.getTime() / 1000),
   }, '54ef8c4e-b8e7-4cf7-b4e5-35643f814fa6' /* process.env['secret'] */);
-};
-  
-validateJWT = (token) =>{
-  //will use dynamic secret it in production but not in development 
-  //const secret = process.env['secret'];
-  return jwt.verify(token, '54ef8c4e-b8e7-4cf7-b4e5-35643f814fa6'/*secret*/, (err) => {
-    if (err) {
-      if (e instanceof jwt.JsonWebTokenError) {
-        throw Error;
-      }
-      throw Error;     
-    }
-  });
-}  
+};  
 
 module.exports = {
-  generateJWT,
-  validateJWT
+  generateJWT
 }

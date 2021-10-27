@@ -14,8 +14,6 @@ class UserUpdation {
             })
             .then((user)=>{
                 return (async()=>{
-                    const isTokenExpired = await validateJWT(req?.cookies?.jwt)
-                    if(isTokenExpired) return new Error('session expired');
                     user.phoneNumber = req.body.phoneNumber
                     user.username = req.body.username
                     user.email = req.body.email
@@ -30,6 +28,7 @@ class UserUpdation {
                 })();
             })
             .catch(err => {
+                console.log(err)
                 return new Error(err)
             }) 
     }
