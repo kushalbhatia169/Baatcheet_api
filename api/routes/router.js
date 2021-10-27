@@ -7,31 +7,40 @@ const UserLogin = require('../controllers/userLogin')
 const router = express.Router()
 
 router.post('/login', async(req, res) => {
-    const base64Auth =  await checkAuthentication(req);
-    const [username, password] = base64Auth;
-    const body = req.body;
+    const [username, password] = await checkAuthentication(req);
+    //const body = req.body;
     if(!username && !password) {
         return res.status(401).json({ message: 'Missing Authorization Header' });
     }
+    console.log(username, password)
     try {
         const userLogin = new UserLogin();
-        const status = await userLogin.aunthenticateUser(body.username, body.password);
+        const status = await userLogin.aunthenticateUser(username, password);
+        console.log(status, 'status')
         if(status instanceof Error) {
             return res.status(400).json({
                 error:status,
                 message: 'User not found!',
             })
         }
-        res.cookie("jwt", status["x-auth-token"], {
-            secure: false,
-            httpOnly: true,
-        });
-        return res.status(200).json({ 
-            success: true, 
-            message:"User logged in", 
-            data: status?.user
-        })
+        if(status){
+            const {_id, username, phoneNumber, email} = status.user;
+            res.cookie("jwt", status["x-auth-token"], {
+                secure: false,
+                httpOnly: true,
+            });  
+            //console.log(status)
+            return res.status(200).json({ 
+                success: true, 
+                message:"User logged in", 
+                data: {_id, username, phoneNumber, email}
+            })
+        }
+        else {
+            throw Error;
+        }
     } catch (error) {
+        console.log(error)
         return res.status(400).json({
             error,
             message: 'User not logged in!',
