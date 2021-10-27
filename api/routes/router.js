@@ -6,16 +6,14 @@ const UserUpdation = require('../controllers/UserUpdation')
 const middleware = require("../middlewares");
 const router = express.Router()
 
-router.post('/login', async(req, res) => {
-    const [username, password] = await checkAuthentication(req);
-    //const body = req.body;
-    if(!username || !password) {
-        return res.status(401).json({ success: false, message: 'Missing Authorization Header' });
-    }
+console.log(middleware)
+
+router.post('/login', middleware.isAuthenticated, async(req, res) => {
+    const userLogin = new UserLogin();
+    const status = await userLogin.aunthenticateUser(req.username, req.password);
     try {
-        const userLogin = new UserLogin();
-        const status = await userLogin.aunthenticateUser(username, password);
         if(status instanceof Error) {
+            console.log(status)
             return res.status(400).json({
                 success: false,
                 error:status,
@@ -39,6 +37,7 @@ router.post('/login', async(req, res) => {
             throw Error;
         }
     } catch (error) {
+        console.log(error)
         return res.status(400).json({
             success: false,
             error,
