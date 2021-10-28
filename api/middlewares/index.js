@@ -10,21 +10,21 @@ module.exports.isAuthorized = (req, res, next) => {
         error:'no token found!',
       })
     }
-    try {
-      jwt.verify(token, '54ef8c4e-b8e7-4cf7-b4e5-35643f814fa6'/*secret*/);
-      next();
-    } catch (error) {
-      if (error instanceof jwt.JsonWebTokenError) {
-        res.status(400).json({
+    jwt.verify(token, '54ef8c4e-b8e7-4cf7-b4e5-35643f814fa6'/*secret*/, (error) => {
+      if(error){
+        if (error instanceof jwt.JsonWebTokenError) {
+          return res.status(400).json({
+            success: false,
+            error:'invalid token!',
+          })
+        }
+        return res.status(400).json({
           success: false,
-          error:'invalid token!',
+          error:'unexpected error',
         })
       }
-      return res.status(400).json({
-        success: false,
-        error:'unexpected error',
-      }) 
-    }
+      next(); 
+    });
   }
 
   module.exports.isAuthenticated = (req, res, next) => {
@@ -47,3 +47,20 @@ module.exports.isAuthorized = (req, res, next) => {
       }) 
     }
   }
+
+
+  // try {
+  //   jwt.verify(token, '54ef8c4e-b8e7-4cf7-b4e5-35643f814fa6'/*secret*/);
+  //   next();
+  // } catch (error) {
+  //     if (error instanceof jwt.JsonWebTokenError) {
+  //       res.status(400).json({
+  //         success: false,
+  //         error:'invalid token!',
+  //       })
+  //     }
+  //     return res.status(400).json({
+  //       success: false,
+  //       error:'unexpected error',
+  //     }) 
+  // }

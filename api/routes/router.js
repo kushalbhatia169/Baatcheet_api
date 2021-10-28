@@ -1,14 +1,17 @@
 const express = require('express')
-const checkAuthentication = require("../utils/base64Auth")
-const UserRegistration = require('../controllers/UserRegistration')
-const UserLogin = require('../controllers/userLogin')
-const UserUpdation = require('../controllers/UserUpdation')
+const { isEmpty } = require('lodash');
+const UserRegistration = require('../controllers/UserRegistration');
+const UserLogin = require('../controllers/userLogin');
+const UserUpdation = require('../controllers/UserUpdation');
+const GetAllUsers = require('../controllers/GetAllUsers');
 const middleware = require("../middlewares");
+const GetSingleUser = require('../controllers/GetSingleUser');
+const UserDeletion = require('../controllers/UserDeletion');
 const router = express.Router()
 
 console.log(middleware)
 
-router.post('/login', middleware.isAuthenticated, async(req, res) => {
+router.get('/login', middleware.isAuthenticated, async(req, res) => {
     const userLogin = new UserLogin();
     const status = await userLogin.aunthenticateUser(req.username, req.password);
     try {
@@ -44,7 +47,7 @@ router.post('/login', middleware.isAuthenticated, async(req, res) => {
             message: 'User not logged in!',
         })
     }
-})
+});
 
 router.post('/', async (req, res) => {
     const userRegistration = new UserRegistration();
@@ -71,7 +74,7 @@ router.post('/', async (req, res) => {
             message: 'User not created!',
         })
     }
-})
+});
 
 router.put('/:id/update', middleware.isAuthorized, async(req, res)=>{
     const userUpdation = new UserUpdation();
@@ -82,7 +85,7 @@ router.put('/:id/update', middleware.isAuthorized, async(req, res)=>{
             return res.status(400).json({
                 success: false,
                 message: 'User not updated!',
-          })
+            })
         }
         if(status){
             const {_id, username, phoneNumber, email} = status;
@@ -102,9 +105,84 @@ router.put('/:id/update', middleware.isAuthorized, async(req, res)=>{
             message: 'User not updated!',
         })
     }
-})
-// router.delete('/:id/delete',middleware.isAuthorized, My_app_Ctrl.deleteUser)
-// router.get('/:id', My_app_Ctrl.getUserById)
-// router.get('/users', My_app_Ctrl.getUsers)
+});
+
+router.delete('/:id/delete',middleware.isAuthorized, async(req, res) => {
+    const deleteUser = new UserDeletion;
+    try {
+        const status = await deleteUser.deleteUser(req);
+        if(status instanceof Error) {
+            return res.status(400).json({
+                status: false,
+                message: 'can not delete user',
+            });
+        }
+        if(status) {
+            return res.status(201).json({
+                success: true,
+                message: 'user deleted!',
+            })
+        }
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            error,
+            message: 'User not deleted!',
+        })
+    }
+});
+
+router.get('/users', middleware.isAuthorized, async(req, res)=> {
+    const getAllUsers = new GetAllUsers;
+    try {
+        const status = await getAllUsers.getUsers(); 
+        if(status instanceof Error || isEmpty(status)) {
+            return res.status(400).json({
+                status: false,
+                message: 'can not retrive users',
+            });
+        }
+        if(status) {
+            return res.status(201).json({
+                success: true,
+                data: {...status},
+                message: 'fetched all user',
+            })
+        }
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            error,
+            message: 'Users not fetched!',
+        })
+    }
+});
+
+router.get('/:id', middleware.isAuthorized, async(req, res)=> {
+    const getUser = new GetSingleUser();
+    try {
+        const status = await getUser.getUserById(req);
+        if(status instanceof Error) {
+            return res.status(400).json({
+                status: false,
+                message: 'can not retrive user',
+            });
+        }
+        if(status) {
+            const {_id, username, phoneNumber, email} = status;
+            return res.status(201).json({
+                success: true,
+                data: {_id, username, phoneNumber, email},
+                message: 'user data!',
+            })
+        }
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            error,
+            message: 'User not fetched!',
+        })
+    }
+});
 
 module.exports = router
