@@ -1,28 +1,24 @@
 const express = require('express');
 const path = require('path');
+const cookieParser = require("cookie-parser");
 const app = express(),
-      //bodyParser = require("body-parser");
-      port = 3000,
-      cors = require('cors');
-      db = require('./db');
-      require('dotenv').config({path: __dirname + '/.env'});
-// place holder for the data
+  port = 3000,
+  cors = require('cors');
+  db = require('./models/index');
+require('dotenv').config({path: __dirname + '/.env'});
 const userRouter = require('./routes/router');
-
-app.use(cors());
-
+const corsOptions = {
+  origin: "*",
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
-
 app.use(express.static(path.join(__dirname, '../my-app/build')));
+app.use(cookieParser());
 
 db.on('error', console.error.bind(console, 'MongoDB connection error:'))
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
-app.use('/api', userRouter)
-
+app.use('/api/user', userRouter)
 app.listen(port, () => {
   console.log(`Server listening on the port::${port}`);
 });
