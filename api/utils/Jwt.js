@@ -11,8 +11,9 @@ generateJWT = async(user) =>{
   return jwt.sign({
     id: user._id,
     username: user.username,
-    exp: parseInt(exp.getTime() / 1000),
-  }, '54ef8c4e-b8e7-4cf7-b4e5-35643f814fa6' /* process.env['secret'] */);
+  }, '54ef8c4e-b8e7-4cf7-b4e5-35643f814fa6',{
+    expiresIn:'10h'
+  } /* process.env['secret'] */);
 };  
 
 module.exports = {

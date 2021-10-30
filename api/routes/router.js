@@ -53,9 +53,10 @@ router.post('/', async (req, res) => {
     const userRegistration = new UserRegistration();
     const body = req.body;
     try {
-        const status = await userRegistration.createUserData(body);
-        console.log('status', status)
+        const status = await userRegistration.createUserData(body),
+        {_id, username, phoneNumber, email} = status;
         if(status instanceof Error) {
+            console.log(status)
             return res.status(400).json({
                 success: false,
                 message: 'User not created!',
@@ -63,7 +64,7 @@ router.post('/', async (req, res) => {
         }
         return res.status(201).json({
             success: true,
-            data: status, 
+            data: {_id, username, phoneNumber, email}, 
             message: 'User created!',
         })
     } catch (error) {
@@ -117,6 +118,7 @@ router.delete('/:id/delete',middleware.isAuthorized, async(req, res) => {
                 message: 'can not delete user',
             });
         }
+        console.log(status)
         if(status) {
             return res.status(201).json({
                 success: true,
