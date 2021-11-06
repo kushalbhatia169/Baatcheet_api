@@ -4,12 +4,14 @@ const UserRegistration = require('../controllers/UserRegistration');
 const UserLogin = require('../controllers/userLogin');
 const UserUpdation = require('../controllers/UserUpdation');
 const GetAllUsers = require('../controllers/GetAllUsers');
-const middleware = require("../middlewares");
 const GetSingleUser = require('../controllers/GetSingleUser');
 const UserDeletion = require('../controllers/UserDeletion');
-const router = express.Router()
-
-console.log(middleware)
+const VerifyUserEmail = require('../controllers/VerifyUserEmail');
+const sendEmail = require("../utils/email");
+const middleware = require("../middlewares");
+const Token = require("../models/token");
+const crypto = require('crypto');
+const router = express.Router();
 
 router.get('/login', middleware.isAuthenticated, async(req, res) => {
     const userLogin = new UserLogin();
@@ -62,10 +64,18 @@ router.post('/', async (req, res) => {
                 message: 'User not created!',
           })
         }
+        const token = await new Token({
+            userId: _id,
+            token: crypto.randomBytes(32).toString("hex"),
+          }).save();
+      
+        const message = `${process.env.BASE_URL}/verify/${_id}/${token.token}`;
+        await sendEmail(email, "Please confirm your Email account", message);
+      
         return res.status(201).json({
             success: true,
             data: {_id, username, phoneNumber, email}, 
-            message: 'User created!',
+            message: 'An Email sent to your account please verify',
         })
     } catch (error) {
         console.log('error', error)
@@ -74,6 +84,22 @@ router.post('/', async (req, res) => {
             error,
             message: 'User not created!',
         })
+    }
+});
+
+router.get("/verify/:id/:token", async (req, res) => {
+    const verifyUserEmail = new VerifyUserEmail();
+    try {
+    const status = await verifyUserEmail.verifyUserEmail(req);
+    console.log(`tatus`, status)
+    if(status instanceof Error) {
+        return res.status(400).send("Invalid link");
+    }
+    if(!status) throw Error;
+      return res.send("email verified sucessfully");
+    } catch (error) {
+        console.log(error)
+      res.status(400).send("An error occured");
     }
 });
 

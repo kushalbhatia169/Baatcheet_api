@@ -30,6 +30,14 @@ const User = new Schema(
     },
     hash: String,
     salt: String,
+    emailVerified: { 
+      type: Boolean,
+      default: false,
+    },
+    phoneVerified: { 
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 )
