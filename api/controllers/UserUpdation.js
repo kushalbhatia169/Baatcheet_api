@@ -2,7 +2,7 @@ const User = require('../models/User');
 const { Error } = require('mongoose');
 
 class UserUpdation {
-    async updateUser(id, req){
+    async updateUser(id, req, verify){
         return await User.findOne({ _id: id }, async(err, user) => {
                 if (err) {
                     return new Error(err)
@@ -14,9 +14,14 @@ class UserUpdation {
             })
             .then((user)=>{
                 return (async()=>{
-                    user.phoneNumber = req.body.phoneNumber
-                    user.username = req.body.username
-                    user.email = req.body.email
+                    if(verify === 'phoneVerify') {
+                        user.phoneVerified = req.body.phoneVerified;
+                    }
+                    else {
+                        user.phoneNumber = req.body.phoneNumber
+                        user.username = req.body.username
+                        user.email = req.body.email
+                    }
                     return user
                             .save()
                             .then((user) => {

@@ -87,16 +87,43 @@ router.post('/', async (req, res) => {
     }
 });
 
+router.put("/verify/phone/:id", async (req, res) => {
+    const userUpdation = new UserUpdation();
+    try {
+      const { id } = req.params;
+      const verify = 'phoneVerify'
+      const status = await userUpdation.updateUser(id, req, verify);
+        if(status instanceof Error) {
+            return res.status(400).json({
+                success: false,
+                message: 'Phone Number not verified!',
+            })
+        }
+        if(status){
+            return res.status(201).json({
+                success: true,
+                message: 'Phone number successfully verified!',
+            })
+        }
+        else {
+            throw Error;
+        }
+    } catch (error) {
+        console.log(error)
+      res.status(400).send("An error occured");
+    }
+});
+
 router.get("/verify/:id/:token", async (req, res) => {
     const verifyUserEmail = new VerifyUserEmail();
     try {
-    const status = await verifyUserEmail.verifyUserEmail(req);
-    console.log(`tatus`, status)
-    if(status instanceof Error) {
-        return res.status(400).send("Invalid link");
-    }
-    if(!status) throw Error;
-      return res.send("email verified sucessfully");
+        const status = await verifyUserEmail.verifyUserEmail(req);
+        console.log(`tatus`, status)
+        if(status instanceof Error) {
+            return res.status(400).send("Invalid link");
+        }
+        if(!status) throw Error;
+        return res.send("email verified sucessfully");
     } catch (error) {
         console.log(error)
       res.status(400).send("An error occured");

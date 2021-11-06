@@ -1,8 +1,8 @@
 const nodemailer = require("nodemailer");
 
-const sendEmail = async (email, subject, text) => {
+const sendEmail = async (email, subject, link) => {
   // create reusable transporter object using the default SMTP transport
-  console.log("Sending email...", email, subject, text);
+  console.log("Sending email...", email, subject, link);
   console.log(process.env.BASE_URL);
   try {
     const transporter = nodemailer.createTransport({
@@ -21,7 +21,8 @@ const sendEmail = async (email, subject, text) => {
       to: email,
       subject: subject,
       html: `Hello,<br> Please Click on the link to verify your email.<br>
-      <a href=${text}>Click here to verify</a>`,
+      <a href=${link}>Click here to verify</a><br><br>
+      Please check mail in junk box if you not find in inbox.`,
     });
     console.log("email sent sucessfully");
   } catch (error) {
