@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const { Error } = require('mongoose');
+// const { Error } = require('mongoose');
 
 class GetSingleUser {
     async getUserById(req){

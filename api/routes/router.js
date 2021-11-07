@@ -18,11 +18,26 @@ router.get('/login', middleware.isAuthenticated, async(req, res) => {
     const status = await userLogin.aunthenticateUser(req.username, req.password);
     try {
         if(status instanceof Error) {
-            console.log(status)
-            return res.status(400).json({
+            if(status.message.split(' ').find(word => word.includes('verify'))) {
+                const _id = status.message.split('|')[1];
+                const email = status.message.split('|')[2];
+                if(email !== 'false') {
+                    const token = await new Token({
+                        userId: _id,
+                        token: crypto.randomBytes(32).toString("hex"),
+                    }).save();
+                    const message = `${process.env.BASE_URL}/verify/${_id}/${token.token}`;
+                    await sendEmail(email, "Please confirm your Email account", message);
+                }
+                return res.status(200).json({
+                    success: false,
+                    message: status.message.split('|')[0],
+                    data:{ _id: _id },
+                });
+            };
+            return res.status(200).json({
                 success: false,
-                error:status,
-                message: 'User not found!',
+                message: status.message,
             })
         }
         if(status){
@@ -45,7 +60,6 @@ router.get('/login', middleware.isAuthenticated, async(req, res) => {
         console.log(error)
         return res.status(400).json({
             success: false,
-            error,
             message: 'User not logged in!',
         })
     }
@@ -58,8 +72,7 @@ router.post('/', async (req, res) => {
         const status = await userRegistration.createUserData(body),
         {_id, username, phoneNumber, email} = status;
         if(status instanceof Error) {
-            console.log(status)
-            return res.status(400).json({
+            return res.status(200).json({
                 success: false,
                 message: 'User not created!',
           })
@@ -94,7 +107,7 @@ router.put("/verify/phone/:id", async (req, res) => {
       const verify = 'phoneVerify'
       const status = await userUpdation.updateUser(id, req, verify);
         if(status instanceof Error) {
-            return res.status(400).json({
+            return res.status(200).json({
                 success: false,
                 message: 'Phone Number not verified!',
             })
@@ -109,8 +122,7 @@ router.put("/verify/phone/:id", async (req, res) => {
             throw Error;
         }
     } catch (error) {
-        console.log(error)
-      res.status(400).send("An error occured");
+        res.status(400).send("An error occured");
     }
 });
 
@@ -118,14 +130,12 @@ router.get("/verify/:id/:token", async (req, res) => {
     const verifyUserEmail = new VerifyUserEmail();
     try {
         const status = await verifyUserEmail.verifyUserEmail(req);
-        console.log(`tatus`, status)
         if(status instanceof Error) {
-            return res.status(400).send("Invalid link");
+            return res.status(200).send("Invalid link");
         }
         if(!status) throw Error;
         return res.send("email verified sucessfully");
     } catch (error) {
-        console.log(error)
       res.status(400).send("An error occured");
     }
 });
@@ -136,9 +146,9 @@ router.put('/:id/update', middleware.isAuthorized, async(req, res)=>{
     try {
         const status = await userUpdation.updateUser(id, req);
         if(status instanceof Error) {
-            return res.status(400).json({
+            return res.status(200).json({
                 success: false,
-                message: 'User not updated!',
+                message:  status.message,
             })
         }
         if(status){
@@ -166,9 +176,9 @@ router.delete('/:id/delete',middleware.isAuthorized, async(req, res) => {
     try {
         const status = await deleteUser.deleteUser(req);
         if(status instanceof Error) {
-            return res.status(400).json({
+            return res.status(200).json({
                 status: false,
-                message: 'can not delete user',
+                message:  status.message,
             });
         }
         console.log(status)
@@ -192,9 +202,9 @@ router.get('/users', middleware.isAuthorized, async(req, res)=> {
     try {
         const status = await getAllUsers.getUsers(); 
         if(status instanceof Error || isEmpty(status)) {
-            return res.status(400).json({
+            return res.status(200).json({
                 status: false,
-                message: 'can not retrive users',
+                message: status.message,
             });
         }
         if(status) {
@@ -218,9 +228,9 @@ router.get('/:id', middleware.isAuthorized, async(req, res)=> {
     try {
         const status = await getUser.getUserById(req);
         if(status instanceof Error) {
-            return res.status(400).json({
+            return res.status(200).json({
                 status: false,
-                message: 'can not retrive user',
+                message: status.message,
             });
         }
         if(status) {
@@ -235,7 +245,7 @@ router.get('/:id', middleware.isAuthorized, async(req, res)=> {
         return res.status(400).json({
             success: false,
             error,
-            message: 'User not fetched!',
+            message: error,
         })
     }
 });

@@ -1,6 +1,6 @@
 
 const User = require('../models/User');
-const { Error } = require('mongoose');
+// const { Error } = require('mongoose');
 const {setPassword} = require('../utils/hashPassword');
 class UserRegistration {
   async createUserData(body) {   

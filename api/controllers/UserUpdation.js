@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const { Error } = require('mongoose');
+// const { Error } = require('mongoose');
 
 class UserUpdation {
     async updateUser(id, req, verify){

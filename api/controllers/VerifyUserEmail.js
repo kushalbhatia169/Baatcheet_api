@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const Token = require('../models/token');
-const { Error } = require('mongoose');
+// const { Error } = require('mongoose');
 
 class VerifyUserEmail {
     async verifyUserEmail(req) {
@@ -14,7 +14,6 @@ class VerifyUserEmail {
                     userId: user._id,
                     token: req.params.token,
                 });
-                console.log(token);
                 if (!token) return new Error('Invalid token');
                     user.emailVerified= true;
                     return user
