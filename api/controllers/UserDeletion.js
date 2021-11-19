@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const { Error } = require('mongoose');
+// const { Error } = require('mongoose');
 class UserDeletion {
     async deleteUser (req) {
         return await User.findOneAndDelete({ _id: req.params.id }, (err, user) => {

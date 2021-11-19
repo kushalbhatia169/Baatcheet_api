@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../my-app/build')));
 app.use(cookieParser());
 
-db.on('error', console.error.bind(console, 'MongoDB connection error:'))
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.use('/api/user', userRouter)
 app.listen(port, () => {
