@@ -4,8 +4,9 @@ module.exports.isAuthorized = (req, res, next) => {
     //will use dynamic secret it in production but not in development 
     //const secret = process.env['secret'];
     const token = req?.cookies?.jwt;
+    console.log(token)
     if(!token) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
         error:'no token found!',
       })

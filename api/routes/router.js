@@ -11,6 +11,7 @@ const sendEmail = require("../utils/email");
 const middleware = require("../middlewares");
 const Token = require("../models/token");
 const crypto = require('crypto');
+const AddNewContact = require('../controllers/AddNewContatct');
 const router = express.Router();
 
 router.get('/login', middleware.isAuthenticated, async(req, res) => {
@@ -249,5 +250,36 @@ router.get('/:id', middleware.isAuthorized, async(req, res)=> {
         })
     }
 });
+
+router.post('/addContact', async (req, res) => {
+    const addContact = new AddNewContact();
+    try {
+        const status = await addContact.addNewContact(req);
+        if(status instanceof Error) {
+            console.log(status)
+            return res.status(200).json({
+                success: false,
+                message: status.message,
+            });
+        }
+        if(status) {
+            return res.status(201).json({
+                success: true,
+                data: {...status?._doc},
+                message: 'Contact added!',
+            })
+        }
+        else {
+            throw Error;
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(400).json({
+            success: false,
+            error,
+            message: 'Contact not added!',
+        })
+    }
+})
 
 module.exports = router
