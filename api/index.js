@@ -1,12 +1,14 @@
 const express = require('express');
 //const path = require('path');]
 const getUniqueId = require('./config/config.cjs');
+const cookieParser = require("cookie-parser");
 const GetSingleUserByName = require('./controllers/GetSingleUserByName');
 const app = express(),
 db = require('./models/index');
       port = 8080;
 //require('dotenv').config({path: __dirname + '/.env'});
 
+app.use(cookieParser());
 const http = require('http').createServer(app);
 const io = require('socket.io')(http, {
   cors: {

@@ -46,12 +46,13 @@ router.get('/login', middleware.isAuthenticated, async(req, res) => {
             res.cookie("jwt", status["x-auth-token"], {
                 secure: false,
                 httpOnly: true,
-            });  
-            //console.log(status)
+            }); 
+         
             return res.status(200).json({ 
                 success: true, 
                 message:"User logged in", 
-                data: {_id, username, phoneNumber, email}
+                data: {_id, username, phoneNumber, email, 
+                    jwt: status["x-auth-token"],}
             })
         }
         else {
@@ -251,7 +252,7 @@ router.get('/:id', middleware.isAuthorized, async(req, res)=> {
     }
 });
 
-router.post('/addContact', async (req, res) => {
+router.post('/addContact',middleware.isAuthorized, async (req, res) => {
     const addContact = new AddNewContact();
     try {
         const status = await addContact.addNewContact(req);
