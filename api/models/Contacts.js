@@ -7,7 +7,9 @@ const Contacts = new Schema(
     clientId: {
         type: String,  
         required:[true, "can't be blank"], 
-        index: true  
+        // index: true, 
+        unique:false,
+        foreignKey: true 
     },
     userId: { 
       type: String, 

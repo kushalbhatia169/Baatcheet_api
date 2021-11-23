@@ -12,6 +12,7 @@ const middleware = require("../middlewares");
 const Token = require("../models/token");
 const crypto = require('crypto');
 const AddNewContact = require('../controllers/AddNewContatct');
+const GetContacts = require('../controllers/GetContacts');
 const router = express.Router();
 
 router.get('/login', middleware.isAuthenticated, async(req, res) => {
@@ -283,4 +284,29 @@ router.post('/addContact',middleware.isAuthorized, async (req, res) => {
     }
 })
 
+router.get('/contacts/:clientId', middleware.isAuthorized, async(req, res)=> {
+    const getContacts = new GetContacts();
+    try {
+        const status = await getContacts.getAllContacts(req);
+        if(status instanceof Error) {
+            return res.status(200).json({
+                status: false,
+                message: status.message,
+            });
+        }
+        if(status) {
+            return res.status(201).json({
+                success: true,
+                data: [...status],
+                message: 'fetched all contacts',
+            })
+        }
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            error,
+            message: 'Contacts not fetched!',
+        })
+    }
+});
 module.exports = router
