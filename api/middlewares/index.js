@@ -5,7 +5,6 @@ module.exports.isAuthorized = (req, res, next) => {
     //const secret = process.env['secret'];
     const token = req?.headers?.cookies;
     // console.log(req?.cookies?.jwt)
-    console.log(req?.headers?.cookies)
     if(!token) {
       return res.status(400).json({
         success: false,

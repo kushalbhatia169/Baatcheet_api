@@ -5,7 +5,6 @@ const {validateHashPassword} = require('../utils/hashPassword');
 
 class UserLogin {   
   async aunthenticateUser(username, password) {
-    console.log(username, password)
     return await User.findOne({username: username}, (err) => {
         //console.log(user)
         if (err) {

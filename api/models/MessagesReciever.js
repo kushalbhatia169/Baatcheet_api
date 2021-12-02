@@ -1,3 +1,4 @@
+const { boolean } = require('joi');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const uniqueValidator = require('mongoose-unique-validator');
@@ -10,7 +11,6 @@ const messagesReciever = new Schema(
             foreignKey: true,
             // index: true, 
             unique: true,
-            foreignKey: true 
         },
         senderId: { 
             type: String, 
@@ -26,6 +26,10 @@ const messagesReciever = new Schema(
             required:[true, "can't be blank"], 
             index: true 
         },
+        isRead: {
+            type: Boolean,
+            default: false,
+        }
         // groupId: {
         //     type: String, 
         //     lowercase: true, 

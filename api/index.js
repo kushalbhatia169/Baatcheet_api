@@ -3,6 +3,7 @@ const express = require('express');
 const getUniqueId = require('./config/config.cjs');
 const cookieParser = require("cookie-parser");
 const GetSingleUserByName = require('./controllers/GetSingleUserByName');
+const SaveMessage = require('./controllers/SaveMessage');
 const app = express(),
 db = require('./models/index');
       port = 8080;
@@ -34,7 +35,24 @@ io.on('connection', (socket) => {
 
   socket.on('chat message', async (clientData) => {
     console.log('Message from client: ', clientData);
-    io.emit('chat message', {message:clientData.msg, user: clientData.user.username});
+    const saveMsg = new SaveMessage();
+    try {
+      const messageData = {
+        message: clientData.msg,
+        senderId: clientData.clientId,
+        recieverId: clientData.recieverId,
+      }
+      await saveMsg.saveMessage(messageData)
+        .then(()=>{
+          io.emit('chat message', { message: clientData.msg, user: clientData.username,  
+            senderId: clientData.clientId, receiverId: clientData.recieverId });
+        })
+        .catch((err)=>{
+          throw new Error(err);
+        });
+    } catch (error) {
+        console.log(error);
+    }
   });
 
   socket.on('getUser', async(clientData) => {
