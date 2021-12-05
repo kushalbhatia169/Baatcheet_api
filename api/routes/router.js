@@ -13,6 +13,7 @@ const Token = require("../models/token");
 const crypto = require('crypto');
 const AddNewContact = require('../controllers/AddNewContatct');
 const GetContacts = require('../controllers/GetContacts');
+const GetChats = require('../controllers/GetChats');
 const router = express.Router();
 
 router.get('/login', middleware.isAuthenticated, async(req, res) => {
@@ -301,6 +302,9 @@ router.get('/contacts/:clientId', middleware.isAuthorized, async(req, res)=> {
                 message: 'fetched all contacts',
             })
         }
+        else {
+            throw Error;
+        }
     } catch (error) {
         return res.status(400).json({
             success: false,
@@ -309,4 +313,37 @@ router.get('/contacts/:clientId', middleware.isAuthorized, async(req, res)=> {
         })
     }
 });
+
+router.post('/getChats', middleware.isAuthorized, async(req, res) => {
+    const getMsgs = new GetChats();
+    try {
+        const status = await getMsgs.getChats(req);
+        console.log('321', status)
+        if(status instanceof Error) {
+            return res.status(200).json({
+                status: false,
+                message: status.message,
+            });
+        }
+        if(status) {
+            return res.status(201).json({
+                success: true,
+                data: [...status],
+                message: 'fetched all chats',
+            })
+        }
+        else {
+            throw Error;
+        }
+    }
+    catch (error){
+        console.log(error)
+        return res.status(400).json({
+            success: false,
+            error,
+            message: 'Chats not fetched!',
+        })
+    }
+});
+
 module.exports = router

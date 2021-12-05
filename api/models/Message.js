@@ -9,6 +9,7 @@ const message = new Schema(
             required:[true, "can't be blank"], 
             unique: false,
             index: false,
+            ref: 'messagesReciever',
         },
         // groupId: {
         //     type: String, 
@@ -24,4 +25,4 @@ const message = new Schema(
 )
 
 message.plugin(uniqueValidator, {message: `User is already taken.`});
-module.exports = mongoose.model('Message', message)
+module.exports = mongoose.model('Message', message, 'messages')

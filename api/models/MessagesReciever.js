@@ -5,11 +5,12 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 const messagesReciever = new Schema(
     {
-        messageId: {
-            type: String,  
+        chats: {
+            type: Schema.Types.ObjectId,  
             required:[true, "can't be blank"], 
             foreignKey: true,
             // index: true, 
+            ref: 'Message',
             unique: true,
         },
         senderId: { 
@@ -44,4 +45,4 @@ const messagesReciever = new Schema(
 )
 
 messagesReciever.plugin(uniqueValidator, {message: `Message is already there.`});
-module.exports = mongoose.model('MessagesReciever', messagesReciever)
+module.exports = mongoose.model('MessagesReciever', messagesReciever, 'messagesrecievers')
