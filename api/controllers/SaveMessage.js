@@ -6,27 +6,28 @@ class SaveMessage {
         const usermsg = {
             msg : messageData.message,
         };
-        console.log(usermsg);
         const message = new Message(usermsg);
-        await message
+        return await message
             .save()
             .then(async (msg)=>{
-                console.log(msg);
+                console.log(messageData);
                 const messageReciever = new MessagesReciever();
                 const messageId = msg._id;
                 messageReciever.chats = messageId;
                 messageReciever.recieverId = messageData.recieverId;
                 messageReciever.senderId = messageData.senderId;
-                await messageReciever
+                messageReciever.isRead = messageData.isRead;
+                return await messageReciever
                     .save()
                     .then(()=>{
-                        return true;
+                        console.log('Message saved');
+                        return msg._id;
                     })
                     .catch((e)=>{
                         console.log(e)
                         return false;
                     });
-                console.log('Message saved');
+                
             })
             .catch(err=>{
                 console.log(err);

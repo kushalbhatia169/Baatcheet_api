@@ -7,7 +7,8 @@ class GetChats {
         return await MessagesReciever.find({ $or: [
                 { senderId: userId, recieverId: clientId },
                 { senderId: clientId, recieverId: userId }
-            ]},)
+            ]})
+            .sort({ createdAt: 1 })
             .populate('chats') // multiple path names in one requires mongoose >= 3.6
             .then(async (usersDocuments) => {
                 return usersDocuments;

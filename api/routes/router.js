@@ -318,7 +318,7 @@ router.post('/getChats', middleware.isAuthorized, async(req, res) => {
     const getMsgs = new GetChats();
     try {
         const status = await getMsgs.getChats(req);
-        console.log('321', status)
+       
         if(status instanceof Error) {
             return res.status(200).json({
                 status: false,
@@ -329,7 +329,6 @@ router.post('/getChats', middleware.isAuthorized, async(req, res) => {
             return res.status(201).json({
                 success: true,
                 data: [...status],
-                message: 'fetched all chats',
             })
         }
         else {

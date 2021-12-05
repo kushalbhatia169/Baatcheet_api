@@ -39,13 +39,14 @@ io.on('connection', (socket) => {
     try {
       const messageData = {
         message: clientData.msg,
-        senderId: clientData.clientId,
+        senderId: clientData.senderId,
         recieverId: clientData.recieverId,
       }
       await saveMsg.saveMessage(messageData)
-        .then(()=>{
-          io.emit('chat message', { message: clientData.msg, user: clientData.username,  
-            senderId: clientData.clientId, receiverId: clientData.recieverId });
+        .then((id)=>{
+          console.log(id)
+          io.emit('chat message', { msgId: id, message: clientData.msg, user: clientData.user,  
+            senderId: clientData.senderId, recieverId: clientData.recieverId });
         })
         .catch((err)=>{
           throw new Error(err);
