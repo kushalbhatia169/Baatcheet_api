@@ -10,6 +10,6 @@ module.exports = {
   },
   loader: "babel-loader", // or just "babel"
   query: {
-    presets: [ <other presets />, 'stage-0']
+    presets: [ <other presets >, 'stage-0']
   },
 };
