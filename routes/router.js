@@ -1,7 +1,7 @@
 const express = require('express')
 const { isEmpty } = require('lodash');
 const UserRegistration = require('../controllers/UserRegistration');
-const UserLogin = require('../controllers/userLogin');
+const UserLogin = require('../controllers/UserLogin');
 const UserUpdation = require('../controllers/UserUpdation');
 const GetAllUsers = require('../controllers/GetAllUsers');
 const GetSingleUser = require('../controllers/GetSingleUser');
