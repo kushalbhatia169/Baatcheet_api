@@ -5,10 +5,7 @@ module.exports = {
   entry: './server.js',
   mode: 'production',
   target: 'node',
-  plugins: [
-    new CaseSensitivePathsPlugin()
-    // other plugins ...
-  ],
+  plugins: new CaseSensitivePathsPlugin(),
   output: {
     path: path.resolve(__dirname, '.'),
     filename: 'server.bundle.js'
