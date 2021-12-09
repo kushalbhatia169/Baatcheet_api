@@ -41,6 +41,7 @@
     "@babel/eslint-parser": "^7.15.8",
     "@heroku/buildpack-registry": "^1.0.1",
     "babel-preset-stage-0": "^6.24.1",
+    "case-sensitive-paths-webpack-plugin": "^2.4.0",
     "del": "^5.1.0",
     "eslint": "^7.30.0",
     "eslint-config-airbnb": "^18.2.1",
