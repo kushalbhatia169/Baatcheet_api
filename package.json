@@ -1,7 +1,7 @@
 {
-  "name": "react-nodejs-example",
+  "name": "backend-baatcheet-api",
   "version": "1.0.0",
-  "description": "example project react with nodejs",
+  "description": "Backend api for baatcheet",
   "main": "server.js",
   "scripts": {
     "start": "node server.bundle.js",
@@ -48,9 +48,10 @@
     "gulp": "^4.0.2",
     "gulp-zip": "^5.0.1",
     "nodemon": "^2.0.7",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
-    "webpack-stream": "^5.2.1"
+    "ts-loader": "^9.2.6",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-stream": "^7.0.0"
   },
   "eslintConfig": {
     "env": {
