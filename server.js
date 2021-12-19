@@ -22,9 +22,6 @@ app.use(express.static(path.join(__dirname, '../my-app/build')));
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.use('/api/user', userRouter)
-app.listen(port, () => {
-  console.log(`Server listening on the port::${port}`);
-});
 
 if ( process.env.NODE_ENV == "production"){ 
   app.use(express.static("client/build")); 
@@ -33,3 +30,7 @@ if ( process.env.NODE_ENV == "production"){
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
  }
 )};
+
+app.listen(port, () => {
+  console.log(`Server listening on the port::${port}`);
+});
