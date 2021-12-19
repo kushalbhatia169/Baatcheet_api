@@ -1,0 +1,18 @@
+@import '../../scss/brand_color';
+
+.footer {
+  background-color: $footerColor;
+  width: 100%;
+  bottom: 0;
+
+  span,
+  a {
+    color: white
+  }
+
+  svg {
+    path {
+      color: white;
+    }
+  }
+}

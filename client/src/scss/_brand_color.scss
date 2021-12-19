@@ -1,0 +1,21 @@
+$primary-shade:('HeadingColor':rgb(128, 0, 128),
+  'textColor':#8c8c8c,
+  'logoColor':-webkit-linear-gradient(rgb(255, 0, 0), rgb(0, 0, 255)),
+  'iconColor':rgb(128, 0, 128),
+  'activeColor':-webkit-linear-gradient(rgb(255, 0, 0), rgb(0, 0, 255)),
+  'footerColor':#282828,
+  'borderColor':rgb(138, 43, 226),
+  'outlineColor': #e6e6e6);
+
+@function primaryColor($color-name) {
+  @return map-get($primary-shade, $color-name)
+}
+
+$heading: primaryColor('HeadingColor');
+$text: primaryColor('textColor');
+$logo: primaryColor('logoColor');
+$icon: primaryColor('iconColor');
+$active: primaryColor('activeColor');
+$footerColor: primaryColor('footerColor');
+$borderColor: primaryColor('borderColor');
+$outlineColor: primaryColor('outlineColor');

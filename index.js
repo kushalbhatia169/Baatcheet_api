@@ -6,7 +6,7 @@ const GetSingleUserByName = require('./controllers/GetSingleUserByName');
 const SaveMessage = require('./controllers/SaveMessage');
 const app = express(),
 db = require('./models/index');
-      port = 8080;
+      port = process.env.PORT || 8080;
 //require('dotenv').config({path: __dirname + '/.env'});
 
 app.use(cookieParser());

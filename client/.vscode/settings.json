@@ -1,0 +1,10 @@
+{
+  "files.trimTrailingWhitespace": true,
+  "eslint.alwaysShowStatus": true,
+  "eslint.debug": true,
+  "eslint.format.enable": true,
+  "eslint.onIgnoredFiles": "warn",
+  "eslint.lintTask.enable": true,
+  "files.eol": "\r\n",
+  "editor.quickSuggestions": true
+}

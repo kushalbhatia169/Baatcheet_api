@@ -1,0 +1,20 @@
+@import './scss/screen_size';
+
+html {
+  @include sm {
+    width: fit-content;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: 'Comic Neue', cursive;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}

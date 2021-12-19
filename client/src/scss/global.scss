@@ -1,0 +1,85 @@
+@import './_brand_color.scss';
+@import 'screen_size';
+
+
+@mixin baseGradient($baseColor) {
+  background: $baseColor;
+  font-weight: 500;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@mixin iconColor($baseColor, $borderColor:false) {
+  svg {
+    fill: $baseColor;
+  }
+}
+
+* {
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "Roboto", sans-serif;
+}
+
+.heading {
+  color: $heading !important;
+  font-weight: 500;
+}
+
+.logo {
+  h2 {
+    @include baseGradient($logo);
+  }
+
+  @include baseGradient($logo);
+}
+
+.active {
+  @include baseGradient($active);
+  border-bottom: 3px solid $borderColor;
+}
+
+.icon {
+  $self: &;
+  @include iconColor($icon);
+
+  &--white {
+    @include iconColor(#fff);
+  }
+}
+
+.content_26 {
+  font-size: 26px;
+  font-weight: 1000;
+}
+
+.bootbox-close-button {
+  background: white;
+  border: unset;
+  color: $text;
+}
+
+.modal-title {
+  color: #0d6efd;
+}
+
+.ant-message-notice {
+  .ant-message-notice-content {
+    .ant-message-custom-content {
+      span {
+        top: -2.5px;
+      }
+    }
+  }
+}
+
+.ant-btn-primary {
+  border-color: #d9d9d9;
+  background: #fff;
+
+  &:hover {
+    background: #e6e6e6;
+    border-color: $heading;
+  }
+}

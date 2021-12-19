@@ -1,0 +1,7 @@
+
+# /node_modules/* and /bower_components/* in the project root are ignored by default
+
+public/*
+node_modules/node-sass/*
+build/
+--ignore-pattern '!node_modules/node-sass/*'

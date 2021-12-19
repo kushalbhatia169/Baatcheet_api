@@ -1,0 +1,80 @@
+@import '../../scss/brand_color';
+
+.main-chat {
+  $self: &;
+  min-height: 650px;
+  display: flex;
+
+  &__header {
+
+    border-bottom: 1px solid $outlineColor;
+
+    .ant-page-header-content {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+
+      span {
+        margin-bottom: .5rem;
+
+        span {
+          color: purple;
+        }
+      }
+    }
+  }
+
+  &__sidebar {
+    border-right: 1px solid $outlineColor;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    //background: purple;
+    width: 70px;
+
+    //height: 1100px;
+    div {
+      margin-top: 20px;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .send-button {
+    background: #fff;
+    height: 50px;
+    width: 60px;
+
+    svg {
+      fill: $heading;
+    }
+
+    &:hover {
+      background: $outlineColor;
+
+      svg {
+        fill: $heading;
+      }
+    }
+  }
+
+  &__chatBox {
+    height: 350px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+
+  &__active {
+    background: $outlineColor;
+    //color: $outlineColor;
+  }
+
+  .anticon-pushpin {
+    svg {
+      font-size: 18px;
+    }
+  }
+}

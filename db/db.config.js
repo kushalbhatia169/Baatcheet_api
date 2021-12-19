@@ -1,8 +1,9 @@
+require('dotenv').config({path: __dirname + '/.env'});
+
 module.exports = {
-    HOST: 'localHost',
-    DBSERVICE: 'mongodb',
-    DBPORT: '127.0.0.1:27017',
-    DBNAME: 'users',
+    DBSERVICE: 'mongodb+srv',
+    DBPORT: `${process.env.DBUser || 'kushal'}:${process.env.DBPassword || 'Kush8127'}@cluster0.hifeh.mongodb.net`,
+    DBNAME: `${process.env.DBName || 'baatcheet'}?retryWrites=true&w=majority`,
     DBPARAMS: {
         useNewUrlParser: true, 
         useUnifiedTopology: true, 

@@ -3,7 +3,7 @@ const path = require('path');
 const cookieParser = require("cookie-parser");
 const bodyParser = require('body-parser');
 const app = express(),
-  port = 8000,
+  port = process.env.PORT || 8000,
   cors = require('cors');
   db = require('./models/index');
 require('dotenv').config({path: __dirname + '/.env'});
@@ -25,3 +25,11 @@ app.use('/api/user', userRouter)
 app.listen(port, () => {
   console.log(`Server listening on the port::${port}`);
 });
+
+if ( process.env.NODE_ENV == "production"){ 
+  app.use(express.static("client/build")); 
+  const path = require("path"); 
+  app.get("*", (req, res) => { 
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+ }
+)};

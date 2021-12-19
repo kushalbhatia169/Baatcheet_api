@@ -1,0 +1,56 @@
+// sass-lint:disable-all
+// Small tablets and large smartphones (landscape view)
+$screen-sm-max: 576px;
+
+// Small tablets (portrait view)
+$screen-md-max: 768px;
+
+// Tablets and small desktops
+$screen-lg-max: 1024px;
+
+// Large tablets and desktops
+$screen-xl-max: 1200px;
+
+//---------------------------------------- Mixin Function ------------------------//
+
+// Small devices
+@mixin sm {
+  @media only screen and (max-width: #{$screen-sm-max}) {
+    @content;
+  }
+}
+
+// Medium devices
+@mixin md {
+  @media only screen and (max-width: #{$screen-md-max}) {
+    @content;
+  }
+}
+
+// Large devices
+@mixin lg {
+  @media only screen and (max-width: #{$screen-lg-max}) {
+    @content;
+  }
+}
+
+// Extra large devices
+@mixin xl {
+  @media only screen and (max-width: #{$screen-xl-max}) {
+    @content;
+  }
+}
+
+// Custom devices
+@mixin rwd($screen) {
+  @media only screen and (max-width: $screen+"px") {
+    @content;
+  }
+}
+
+// Custom devices
+@mixin rwd_min($screen) {
+  @media only screen and (min-width: $screen+"px") {
+    @content;
+  }
+}

@@ -1,0 +1,15 @@
+{
+    "baseUrl":"http://localhost:8000/api/user",
+    "createUser":"/",
+    "loginUser":"/login",
+    "updateUser":"/update",
+    "deleteUser":"/delete",
+    "getUser":"/users",
+    "getAllUser":"/",
+    "verifyPhone": "/verify/phone/",
+    "searchUser": "/search/",
+    "addContact": "/addContact",
+    "getContacts": "/contacts/",
+    "deleteContact": "/deleteContact",
+    "getChats": "/getChats"
+}

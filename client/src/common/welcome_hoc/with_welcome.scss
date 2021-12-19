@@ -1,0 +1,117 @@
+@import '../../scss/brand_color';
+
+@mixin animateLogo ($keyFrameName, $width) {
+  @keyframes #{$keyFrameName} {
+    from {
+      width: 45px;
+    }
+
+    to {
+      width: $width;
+    }
+  }
+}
+
+.welcome-main {
+  width: 100%;
+  color: $text;
+
+  .welcome-head {
+    $self: &;
+    height: 70px;
+    background: snow;
+    border-bottom: 1px solid lightgray;
+    z-index: 1;
+
+    &__link {
+      &__list {
+        font-size: 16px;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
+  .welcome-logo {
+    .content {
+      $self: &;
+      height: 100px;
+
+      &__logo {
+        $self: &;
+
+        span {
+          font-size: 72px;
+          display: inline;
+          animation-delay: 2s;
+
+          @for $i from 1 to 3 {
+            @if $i==1 {
+              &:nth-child(#{$i}) {
+                animation: span1 5s infinite;
+              }
+
+            }
+
+            @else {
+              &:nth-child(#{$i}) {
+                animation: span2 5s infinite;
+              }
+            }
+          }
+        }
+
+        &--module {
+          span {
+            animation-iteration-count: 1 !important;
+          }
+
+        }
+
+        @include animateLogo(span1, 150px);
+        @include animateLogo(span2, 190px)
+      }
+
+      &__text {
+        font-size: 26px;
+      }
+    }
+  }
+
+  .welcome-page-content {
+    $self: &;
+    color: $text;
+
+    &__intro {
+      &__content {
+
+        h3,
+        h1 {
+          color: $text;
+        }
+      }
+
+
+      .p_box {
+        border-right: 3px solid $borderColor
+      }
+    }
+
+    &__whyBC {
+      &__content {
+        width: 300px;
+        height: 315px;
+        margin: 20px;
+        color: $text;
+        //border: 2px solid violet;
+
+        img {
+          height: 200px;
+          width: 250px;
+        }
+      }
+    }
+  }
+}
