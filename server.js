@@ -8,7 +8,6 @@ const app = express(),
   db = require('./models/index');
 require('dotenv').config();   //to read the .env file
 // require('dotenv').config({path: __dirname + '/.env'});
-console.log(process.env)
 const userRouter = require('./routes/router');
 const corsOptions = {
   origin: "*",
@@ -19,7 +18,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../my-app/build')));
+app.use(express.static(path.join(__dirname, './server.bundle.js')));
 
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 

@@ -1,7 +1,7 @@
 const express = require('express');
 //const path = require('path');]
-const getUniqueId = require('./config/config.cjs');
-const cookieParser = require("cookie-parser");
+// const getUniqueId = require('./config/config.cjs');
+// const cookieParser = require("cookie-parser");
 const GetSingleUserByName = require('./controllers/GetSingleUserByName');
 const SaveMessage = require('./controllers/SaveMessage');
 require('dotenv').config();   //to read the .env file
@@ -9,24 +9,19 @@ const app = express(),
 db = require('./models/index');
       port = process.env.PORT || 3000;
 // require('dotenv').config({path: __dirname + '/.env'});
-
-app.use(cookieParser());
-const http = require('http').createServer(app);
-server = require('http').createServer(app),
-io = require('socket.io').listen(server),
-// const io = require('socket.io')(http, {
-//   cors: {
-//     origin: '*',
-//   }
-// });
-
-http.listen(port, ()=>{
-  console.log(`Socket Server listening on the port::8080`);
-});
-
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-const clients = {};
+// app.use(cookieParser());
+const server = require('http').Server(app);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: '*',
+  }
+});
+
+server.listen(port, ()=>{
+  console.log(`Socket Server listening on the port::8080`);
+});
 
 io.on('connection', (socket) => {
   console.log('Client connected to the WebSocket');
