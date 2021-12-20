@@ -15,9 +15,10 @@ import { context } from '../../store/store';
 import './chat.scss';
 import 'antd/dist/antd.css';
 import APICallManager from '../../services/api_manager';
+import config from '../../config.json';
 
 const { Text } = Typography;
-const SERVER = 'ws://baatcheet-77.herokuapp.com';
+const SERVER = config.wsServer;
 
 const ChatDashboard = (props) => {
   const [options, setOptions] = useState([]);

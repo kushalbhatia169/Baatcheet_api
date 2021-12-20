@@ -8,13 +8,14 @@ import { Card, Avatar, Input, Typography, message } from 'antd';
 import { context } from '../../store/store';
 import ChatDashboard from './chat_dashboard';
 import APICallManager from '../../services/api_manager';
+import config from '../../config.json';
 
 const { TextArea } = Input;
 const { Text } = Typography;
 const { Meta } = Card;
 //const client = new W3CWebSocket('ws://127.0.0.1:8000');
 // const SERVER = 'ws://127.0.0.1:8080';
-const SERVER = 'ws://baatcheet-77.herokuapp.com';
+const SERVER = config.wsServer;
 
 
 const Chat = (props) => {
