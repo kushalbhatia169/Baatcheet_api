@@ -13,7 +13,9 @@ const { TextArea } = Input;
 const { Text } = Typography;
 const { Meta } = Card;
 //const client = new W3CWebSocket('ws://127.0.0.1:8000');
-const SERVER = 'ws://127.0.0.1:8080';
+// const SERVER = 'ws://127.0.0.1:8080';
+const SERVER = 'ws://baatcheet-77.herokuapp.com';
+
 
 const Chat = (props) => {
   // console.log('chat props', props);
