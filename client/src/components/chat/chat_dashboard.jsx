@@ -17,7 +17,7 @@ import 'antd/dist/antd.css';
 import APICallManager from '../../services/api_manager';
 
 const { Text } = Typography;
-const SERVER = 'ws://127.0.0.1:8080';
+const SERVER = 'ws://baatcheet-77.herokuapp.com';
 
 const ChatDashboard = (props) => {
   const [options, setOptions] = useState([]);

@@ -1,5 +1,6 @@
 {
     "baseUrl":" https://baatcheet-77.herokuapp.com/api/user",
+    "wsServer":"wss://baatcheet-77.herokuapp.com",
     "createUser":"/",
     "loginUser":"/login",
     "updateUser":"/update",
