@@ -7,16 +7,18 @@ const SaveMessage = require('./controllers/SaveMessage');
 require('dotenv').config();   //to read the .env file
 const app = express(),
 db = require('./models/index');
-      port = process.env.PORT || 8080;
-require('dotenv').config({path: __dirname + '/.env'});
+      port = process.env.PORT || 3000;
+// require('dotenv').config({path: __dirname + '/.env'});
 
 app.use(cookieParser());
 const http = require('http').createServer(app);
-const io = require('socket.io')(http, {
-  cors: {
-    origin: '*',
-  }
-});
+server = require('http').createServer(app),
+io = require('socket.io').listen(server),
+// const io = require('socket.io')(http, {
+//   cors: {
+//     origin: '*',
+//   }
+// });
 
 http.listen(port, ()=>{
   console.log(`Socket Server listening on the port::8080`);
@@ -29,6 +31,7 @@ const clients = {};
 io.on('connection', (socket) => {
   console.log('Client connected to the WebSocket');
   io.emit('message', 'Hello from the server');
+
   // Emitting a new message. Will be consumed by the client
   socket.on('disconnect', () => {
     console.log('Client disconnected');
