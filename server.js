@@ -6,7 +6,9 @@ const app = express(),
   port = process.env.PORT || 8000,
   cors = require('cors');
   db = require('./models/index');
-require('dotenv').config({path: __dirname + '/.env'});
+require('dotenv').config();   //to read the .env file
+// require('dotenv').config({path: __dirname + '/.env'});
+console.log(process.env)
 const userRouter = require('./routes/router');
 const corsOptions = {
   origin: "*",

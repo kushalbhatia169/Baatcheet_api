@@ -11,7 +11,7 @@ generateJWT = async(user) =>{
   return jwt.sign({
     id: user._id,
     username: user.username,
-  }, '54ef8c4e-b8e7-4cf7-b4e5-35643f814fa6',{
+  }, process.env.SECRET_KEY || '54ef8c4e-b8e7-4cf7-b4e5-35643f814fa6', {
     expiresIn:'10h'
   } /* process.env['secret'] */);
 };  
