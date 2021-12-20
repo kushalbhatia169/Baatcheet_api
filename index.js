@@ -4,10 +4,11 @@ const getUniqueId = require('./config/config.cjs');
 const cookieParser = require("cookie-parser");
 const GetSingleUserByName = require('./controllers/GetSingleUserByName');
 const SaveMessage = require('./controllers/SaveMessage');
+require('dotenv').config();   //to read the .env file
 const app = express(),
 db = require('./models/index');
       port = process.env.PORT || 8080;
-//require('dotenv').config({path: __dirname + '/.env'});
+require('dotenv').config({path: __dirname + '/.env'});
 
 app.use(cookieParser());
 const http = require('http').createServer(app);
