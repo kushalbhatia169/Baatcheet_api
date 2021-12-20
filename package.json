@@ -4,7 +4,7 @@
   "description": "Backend api for baatcheet",
   "main": "server.js",
   "scripts": {
-    "start": "node server.bundle.js index.js",
+    "start": "node server.bundle.js",
     "build": "webpack",
     "dev": "node ./server.js localhost 3090",
     "dev_socket": "node ./index.js localhost 3080",
