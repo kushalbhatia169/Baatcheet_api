@@ -38,5 +38,5 @@ jobs:
           sed -i 's/ws:\/\/127.0.0.1:8000/wss:\/\/baatcheet-77.herokuapp.com/g' client/src/config.json
           cat client/src/config.json
           git add .
-          git commit -m "url changed"
+          git commit  -a --allow-empty-message -m "[skip CI]"
           git push

@@ -6,18 +6,18 @@ const sendEmail = async (email, subject, link) => {
   console.log(process.env.BASE_URL);
   try {
     const transporter = nodemailer.createTransport({
-      host: process.env.HOST,
-      service: process.env.SERVICE,
+      host: process.env.HOST || process.env.HOST_local,
+      service: process.env.SERVICE || process.env.SERVICE_local,
       port: 587,
       secure: true,
       auth: {
-        user: process.env.USER,
-        pass: process.env.PASS,
+        user: process.env.USER || process.env.USER_local,
+        pass: process.env.PASS || process.env.PASS_local,
       },
     });
 
     await transporter.sendMail({
-      from: process.env.USER,
+      from: process.env.USER || process.env.USER_local,
       to: email,
       subject: subject,
       html: `Hello,<br> Please Click on the link to verify your email.<br>
