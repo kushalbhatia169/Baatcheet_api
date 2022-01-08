@@ -36,7 +36,7 @@ jobs:
           git config --global user.email "kushalbhatia169@gmail.com"
           git config --global user.name "kushalbhatia169"
           sed -i 's/https:\/\/baatcheet-77.herokuapp.com/http:\/\/localhost:8000/g' client/src/config.json
-          sed -i 's/baatcheet-77.herokuapp.comws:\/\/127.0.0.1:8000/wss:\/\/g' client/src/config.json
+          sed -i 's/wss:\/\/baatcheet-77.herokuapp.com/ws:\/\/127.0.0.1:8000/g' client/src/config.json
           cat client/src/config.json
           git add .
           git commit -m "api url changed"
