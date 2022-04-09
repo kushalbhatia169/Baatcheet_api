@@ -22,7 +22,7 @@ const Router = () => {
           />
           <Route exect path="/login" component={componentsModules['Login']} />
           <Route exect path="/register" component={componentsModules['Register']} />
-          <Route exect path="/contacts" component={componentsModules['Contacts']} />
+          {/* <Route exect path="/contacts" component={componentsModules['Contacts']} /> */}
           <Route exect path="/chats" component={componentsModules['Chat']} />
           <Route exect path="/chat/:id" component={componentsModules['Chat']} />
           <Route exect path="/favourites" component={componentsModules['Favourites']} />
@@ -40,7 +40,7 @@ const Router = () => {
 
 const NoMatch = () => {
   return (
-    <Redirect to="/home" />
+    <Redirect to="/login" />
   );
 };
 export default Router;

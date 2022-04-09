@@ -9,6 +9,7 @@ import { context } from '../../store/store';
 import ChatDashboard from './chat_dashboard';
 import APICallManager from '../../services/api_manager';
 import config from '../../config.json';
+import Contacts from './contacts';
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -97,7 +98,8 @@ const Chat = (props) => {
 
   return (
     <ChatDashboard active="chats">
-      <Box className="w-100 ms-3 mt-3 h-100">
+      <Contacts/>
+      <Box className="w-100 ms-3 mt-3 h-100 main-chat__chats">
         <Box className="me-5" style={{ borderBottom: '1px solid #e6e6e6' }}>
           {state.friends && state.friends.map(friend => {
             if (friend.username === id) {

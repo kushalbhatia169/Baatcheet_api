@@ -109,8 +109,8 @@
 
         }
 
-        @include animateLogo(span1, 80px);
-        @include animateLogo(span2, 60px)
+        @include animateLogo(span1, 75px);
+        @include animateLogo(span2, 55px)
       }
 
       &__text {

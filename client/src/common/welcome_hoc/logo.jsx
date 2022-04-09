@@ -16,9 +16,9 @@ const Logo = ({ module_name }) => {
           <span className="heading logo">!</span>
         </div>
       </Box>
-      <h2 className="content__text heading">Lo Karlo Baat
+      {/* <h2 className="content__text heading">Lo Karlo Baat
         <span role="img" aria-label="" className="mb-2 fs-1" style={{color:'#fff'}}>🗣️</span>
-      </h2>
+      </h2> */}
     </Box>
   );
 };

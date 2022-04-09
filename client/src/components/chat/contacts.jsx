@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Box } from '@mui/system';
 import { Link, withRouter } from 'react-router-dom';
 import { context } from '../../store/store';
-import ChatDashboard from './chat_dashboard';
-import { List, Avatar } from 'antd';
+import AddIcon from '@mui/icons-material/Add';
+import { List, Avatar, Button } from 'antd';
 import APICallManager from '../../services/api_manager';
 
 const Contacts = () => {
@@ -22,10 +22,19 @@ const Contacts = () => {
   }, [state]);
 
   return (
-    <ChatDashboard active="contacts">
-      <Box className="m-3 w-100">
+    // <ChatDashboard active="contacts">
+      <Box className="m-3 main-chat__contacts">
+        <Box className="d-flex flex-wrap justify-content-around">
+          <h3>
+            My Chats
+          </h3>
+          <Button className="btn ms-2">
+            <span className="mb-2"style={{fontSize: 17}}>New Group Chat</span>
+            <AddIcon className="me-2 mb-2"/>
+          </Button>
+        </Box>
         <List
-          className="p-3"
+          className="p-3 mt-2"
           size="large"
           itemLayout="horizontal"
           bordered
@@ -36,11 +45,11 @@ const Contacts = () => {
               style={{ textTransform: 'capitalize', color: 'purple' }}>
               {item.username}
             </Link>}
-            description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+            description="Ant Design, a design language for background applications"
           />}
         />
       </Box>
-    </ChatDashboard>
+    // </ChatDashboard>
   );
 };
 

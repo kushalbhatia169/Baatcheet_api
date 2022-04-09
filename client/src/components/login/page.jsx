@@ -37,7 +37,7 @@ const Page = (props) => {
       else if (res.success) {
         setCookie('token', res.data.jwt, 1);
         dispatch({ type: 'userData', payload: { ...res.data, isLoggedIn: true } });
-        history.push('/contacts');
+        history.push('/chats');
       }
     });
   };

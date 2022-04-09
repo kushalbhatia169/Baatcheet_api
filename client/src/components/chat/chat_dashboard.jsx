@@ -10,7 +10,7 @@ import { withRouter, useHistory } from 'react-router-dom';
 // import { useStyles } from '../../style_jsx/styles';
 import { Menu, Dropdown, message, Space, Avatar, Typography, PageHeader, AutoComplete } from 'antd';
 import { DownOutlined, SettingOutlined, LogoutOutlined, PushpinTwoTone,
-  GiftOutlined } from '@ant-design/icons';
+  GiftOutlined, SearchOutlined } from '@ant-design/icons';
 import { context } from '../../store/store';
 import './chat.scss';
 import 'antd/dist/antd.css';
@@ -102,58 +102,36 @@ const ChatDashboard = (props) => {
 
   return (
     <Box className="main-chat" id="wrapper">
-      {/* {state.userData.isLoggedIn && */}
-      <Box className="d-flex flex-column w-100">
-        <PageHeader className="main-chat__header title">
-          <Box>
-            <Avatar style={{ color: '#f56a00', backgroundColor: 'plum', border: '1px solid purple' }}>
-              {state.userData.username && state.userData.username[0].toUpperCase() || 'U'}
-            </Avatar>
-            <Text id="main-heading" type="secondary" className="ms-3"
-              style={{ fontSize: '24px', textTransform: 'capitalize' }}>
-              {state.userData.username}
-            </Text>
-          </Box>
-          <AutoComplete
-            className="w-50"
-            placeholder="Enter an user name to search and add in your contacts"
-            onSelect={onSelect}
-            onSearch={onSearch}
-            onBlur={() => setOptions([])}
-            options={options} />
-          <Space wrap className="mb-3">
-            <Dropdown overlay={menu}>
-              <Button>
-                Menu <DownOutlined className="ms-2 mt-1" />
-              </Button>
-            </Dropdown>
-          </Space>
-        </PageHeader>
-        <Box className="d-flex h-100">
-          <Box className="main-chat__sidebar">
-            <Box className={`p-3 icon ${active === 'contacts' && 'main-chat__active'}`}
-              onClick={() => routeActivePage('/contacts')}>
-              <PeopleAltTwoToneIcon title="Contacts" />
-            </Box>
-            <Box className={`p-3 icon ${active === 'chats' && 'main-chat__active'}`}
-              onClick={() => routeActivePage('/chats')}>
-              <ChatTwoToneIcon title="Recent Chat" />
-            </Box>
-            <Box className={`p-3 icon ${active === 'favourites' && 'main-chat__active'}`}
-              onClick={() => routeActivePage('/favourites')}>
-              <StarTwoToneIcon title="Favourites" />
-            </Box>
-            <Box className={`p-3 icon ${active === 'pinnedMessages' && 'main-chat__active'}`}
-              onClick={() => routeActivePage('/pinnedMessages')}>
-              <PushpinTwoTone title="Pinned Messages" size="2" twoToneColor="rgb(128, 0, 128)" />
-            </Box>
-            <Box className={`p-3 icon ${active === `status/id` && 'main-chat__active'}`}
-              onClick={() => routeActivePage(`status/id`)}>
-              <AnimationTwoToneIcon title="Status" />
-            </Box>
-          </Box>
-          {children}
-        </Box>
+      <PageHeader className="main-chat__header title">
+          <Button id="main-heading" type="secondary" className="ms-3 mb-3"
+            style={{ fontSize: '24px', textTransform: 'capitalize' }}>
+            <SearchOutlined className="me-2" size={40} style={{fontSize:18, fontWeight:700}}/>
+            <span style={{fontSize: 16}}>Search User</span>
+
+          </Button>
+        {/* <AutoComplete
+          className="w-50"
+          placeholder="Enter an user name to search and add in your contacts"
+          onSelect={onSelect}
+          onSearch={onSearch}
+          onBlur={() => setOptions([])}
+          options={options} />*/}
+           <Text  id="main-heading" type="secondary" className="ms-3 mb-3"
+            style={{ fontSize: '24px', textTransform: 'capitalize', color:'black' }}>
+            ChatBot!
+          </Text>
+        <Space wrap className="mb-3">
+          <Dropdown overlay={menu}>
+            <Button>
+            <Avatar style={{ color: '#000', backgroundColor: 'rgb(185, 245, 208)', border: '1px solid darkgreen' }}>
+            {state.userData.username && state.userData.username[0].toUpperCase() || 'U'}
+          </Avatar> <DownOutlined className="ms-2" />
+            </Button>
+          </Dropdown>
+        </Space>
+      </PageHeader>
+      <Box className="d-flex h-100">
+        {children}
       </Box>
       {/* } */}
     </Box>

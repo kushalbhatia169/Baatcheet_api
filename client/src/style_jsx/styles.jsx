@@ -6,7 +6,7 @@ export const formLabelsTheme = createTheme({
     primary: {
       // light: will be calculated from palette.primary.main,
       //main: '#EB9937',
-      main: '#800080',
+      main: '#000',
       // dark: will be calculated from palette.primary.main,
       // contrastText: will be calculated to contrast with palette.primary.main
     },

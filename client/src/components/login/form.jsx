@@ -22,7 +22,7 @@ const Form = (props) => {
           username: 'kushalJi',
           email: 'kushalbhatia169@gmail.com',
           phone: '8127717273',
-          password: '',
+          password: 'Baatcheet@735',
           confirmPassword: 'Baatcheet@735',
         }),
         hasValidEmail = (value) => /\S+@\S+\.\S+/i.test(value),

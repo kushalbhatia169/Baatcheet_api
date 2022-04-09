@@ -4,22 +4,34 @@
   $self: &;
   min-height: 650px;
   display: flex;
+  flex-direction: column;
 
   &__header {
 
-    border-bottom: 1px solid $outlineColor;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    background: #fff !important;
+    border: 5px solid #e2e8f0;
+    height: 60px;
+    padding: 0px !important;
 
     .ant-page-header-content {
       width: 100%;
       display: flex;
       justify-content: space-between;
+      height: 60px;
+      align-items: center;
+
 
       span {
         margin-bottom: .5rem;
+      }
 
-        span {
-          color: purple;
-        }
+      svg {
+        font-size: large;
+        color: #000;
       }
     }
   }
@@ -75,6 +87,33 @@
   .anticon-pushpin {
     svg {
       font-size: 18px;
+    }
+  }
+
+  &__contacts {
+    width: 31%;
+    flex-direction: column;
+    -webkit-box-align: center;
+    align-items: center;
+    padding: 10px;
+    padding-bottom: 20px;
+    background: #fff;
+    border-radius: 5px;
+    border-width: 1px;
+
+    .ant-btn {
+      background: #edf2f7;
+      justify-content: center;
+      display: flex;
+
+      &:hover {
+        background: #e2e8f0;
+      }
+
+      &:focus {
+        background: #e2e8f0;
+        color: #000;
+      }
     }
   }
 }
