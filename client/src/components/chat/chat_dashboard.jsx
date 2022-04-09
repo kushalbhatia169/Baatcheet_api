@@ -31,7 +31,7 @@ const ChatDashboard = (props) => {
     e.key === '3' && message.info('User successfully logged out.');
     if (e.key === '3') {
       dispatch({ type: 'LOGOUT' });
-      history.push('/home');
+      history.push('/login');
       //window.location.reload();
     }
   };

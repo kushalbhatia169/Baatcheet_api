@@ -17,7 +17,7 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, './server.bundle.js')));
@@ -33,13 +33,14 @@ const io = require('socket.io')(server, {
 
 app.use('/api/user', userRouter)
 
-if ( process.env.NODE_ENV == "production"){ 
-  app.use(express.static("client/build")); 
-  const path = require("path"); 
-  app.get("*", (req, res) => { 
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"));
+  const path = require("path");
+  app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
- }
-)};
+  }
+  )
+};
 
 server.listen(port, () => {
   console.log(`Server listening on the port::${port}`);
@@ -64,25 +65,27 @@ io.on('connection', (socket) => {
         recieverId: clientData.recieverId,
       }
       await saveMsg.saveMessage(messageData)
-        .then((id)=>{
+        .then((id) => {
           console.log(id)
-          io.emit('chat message', { msgId: id, message: clientData.msg, user: clientData.user,  
-            senderId: clientData.senderId, recieverId: clientData.recieverId });
+          io.emit('chat message', {
+            msgId: id, message: clientData.msg, user: clientData.user,
+            senderId: clientData.senderId, recieverId: clientData.recieverId
+          });
         })
-        .catch((err)=>{
+        .catch((err) => {
           throw new Error(err);
         });
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
   });
 
-  socket.on('getUser', async(clientData) => {
-    if(clientData?.user?.username){
+  socket.on('getUser', async (clientData) => {
+    if (clientData?.user?.username) {
       const getUserInfo = new GetSingleUserByName();
       try {
         const user = await getUserInfo.getUserByName(clientData?.searchText);
-        user && io.emit('getUser', {user: user.username, _id: user._id});
+        user && io.emit('getUser', { user: user.username, _id: user._id });
       } catch (error) {
         console.log(error);
       }

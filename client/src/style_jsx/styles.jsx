@@ -44,7 +44,7 @@ export const useStyles = makeStyles(theme => ({
     //   width: 130,
     // },
     //[theme.breakpoints.up('1024')]: {
-    width: 270,
+    width: 480,
     // },
     color: '#76787A',
     fontSize: '14px',
@@ -68,6 +68,17 @@ export const useStyles = makeStyles(theme => ({
   },
   labelForm: {
     fontSize: 18,
+  },
+  formLabel: {  // for login form
+    fontSize: 16,
+    color: '#1A202C',
+    fontWeight: 'bold',
+    width: '100%',
+    marginBottom: '10px',
+    marginTop: '10px',
+    marginLeft: '30px',
+    justifyContent: 'start', // for login form
+    display: 'flex',
   },
 }));
 

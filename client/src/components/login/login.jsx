@@ -1,12 +1,12 @@
 import React from 'react';
 import withWelcome from '../../common/welcome_hoc/with_welcome';
-import LoginRegisterPage from './login_register_page';
+import Page from './page';
 
 const Login = (props) => {
   const { Header, Logo, PageContent } = props;
 
   return (
-    <LoginRegisterPage {...{ Header, Logo, PageContent, from: 'login' }} />
+    <Page {...{ Header, Logo, PageContent, from: 'login' }} />
   );
 };
 

@@ -1,20 +1,38 @@
 @import "../../scss/brand_color";
 @import "../../scss/screen_size";
 
-.login-main {
-  $slef: &;
-  width: 85%;
-  padding: 7rem;
-  border: 3px solid $borderColor;
-  background-color: snow;
-  margin-left: 7rem;
-  margin-top: 3rem;
-  height: 600px;
-  justify-content: center;
+@mixin default_button($baseColor, $width, $hover) {
+  background: $baseColor !important;
+  color: #fff !important;
+  width: $width;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  border-color: transparent !important;
+  border-radius: 2.5%;
+  height: 40px;
+  margin-top: 15px !important;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  outline: none;
+  text-decoration: none;
 
   &--register {
-    height: max-content;
+    width: 94.5%;
   }
+
+  &:hover {
+    background: $hover !important;
+    // color: $text;
+  }
+}
+
+.login-main {
+  $self: &;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   @include sm {
     background: unset;
@@ -29,9 +47,8 @@
 
   &__logo {
     display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    width: 100%;
+    flex-direction: column;
+    align-items: center;
 
     @include sm {
       flex-direction: column;
@@ -40,14 +57,16 @@
   }
 
   &__form {
-    border-left: 3px solid $borderColor;
+    // border-left: 3px solid $borderColor;
     display: flex;
     justify-content: center;
     flex-direction: column;
-    width: 50%;
+    width: 40%;
+    background-color: white;
+    border-radius: 2.5px;
+    padding: 1rem;
 
     @include sm {
-      border-left: unset;
       width: 100%;
     }
 
@@ -67,36 +86,29 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    margin-left: 3rem;
 
-    @include sm {
-      margin-left: unset;
+    &__button {
+      @include default_button(#25c4fe, 94.5%, #2b6cb0);
+    }
+
+    &__link {
+      @include default_button(#e53e3e, 46%, #c53030);
+    }
+
+    &__register {
+      @include default_button(#04AA6D, 46%, #059862);
     }
   }
 
   &__logo_div {
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 100%;
 
     @include sm {
       align-items: unset;
       justify-content: center;
-    }
-  }
-
-  &__button_div {
-    display: flex;
-    flex-direction: column;
-    width: 270px
-  }
-
-  &__button {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-
-    @include sm {
-      margin-left: unset;
     }
   }
 }

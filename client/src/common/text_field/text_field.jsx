@@ -27,12 +27,12 @@ const TextFieldComponent = (props) => {
         variant: 'outlined',
         inputProps: { maxLength: maxLength || 50 },
         ...register(name, { onChange: (e) => setValue(name, e.target.value),
-          required: true, maxLength: maxLength || 30, validate,
+          // required: true, maxLength: maxLength || 30, validate,
         }),
-        error: Boolean(errors && errors[name]),
-        helperText: !notShowError && errors && errors[name] && <Box style={{ 'marginLeft': '-1rem', color: 'red' }} component="span"
-          className="text-capitalize">
-          *{errors[name]?.type === type && `invalid ${name} type` || `${name} is required`}</Box>,
+        // error: Boolean(errors && errors[name]),
+        // helperText: !notShowError && errors && errors[name] && <Box style={{ 'marginLeft': '-1rem', color: 'red' }} component="span"
+        //   className="text-capitalize">
+        //   *{errors[name]?.type === type && `invalid ${name} type` || `${name} is required`}</Box>,
       }
     }>
       {children}

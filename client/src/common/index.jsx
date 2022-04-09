@@ -1,5 +1,4 @@
 import { Box } from '@mui/material';
-import useGetRoute from './use_Get_Route';
 
 let $ = require('jquery');
 global.jQuery = require('jquery');
@@ -11,8 +10,4 @@ export const commonNodeModules = {
   Box,
   bootstrap,
   bootbox,
-};
-
-export const commonModules = {
-  useGetRoute,
 };

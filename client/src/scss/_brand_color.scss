@@ -1,10 +1,13 @@
-$primary-shade:('HeadingColor':rgb(128, 0, 128),
-  'textColor':#8c8c8c,
-  'logoColor':-webkit-linear-gradient(rgb(255, 0, 0), rgb(0, 0, 255)),
-  'iconColor':rgb(128, 0, 128),
-  'activeColor':-webkit-linear-gradient(rgb(255, 0, 0), rgb(0, 0, 255)),
+$primary-shade:('HeadingColor': #000
+  /* rgb(128, 0, 128) */
+  ,
+  'textColor':#000,
+  'logoColor': #000,
+  /* -webkit-linear-gradient(rgb(0, 0, 0), rgb(69, 69, 69)), */
+  'iconColor':#000,
+  'activeColor':rgb(0, 0, 0),
   'footerColor':#282828,
-  'borderColor':rgb(138, 43, 226),
+  'borderColor': #000,
   'outlineColor': #e6e6e6);
 
 @function primaryColor($color-name) {

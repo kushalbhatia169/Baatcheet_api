@@ -1,32 +1,21 @@
 import React, { useContext, useState } from 'react';
 import { Box } from '@mui/material';
 import { useHistory } from 'react-router';
-import FormLoginRegister from './form_login_register';
+import Form from './form';
 import { context } from '../../store/store';
 import APICallManager from '../../services/api_manager';
-import useGetRoute from '../../common/use_Get_Route';
 import firebase from '../../firebase';
 import Checkotp from './checkOtp';
-import { notification } from 'antd';
-import { getNotificationStyle } from '../../common/getNotificarionStyle.ts';
 import './login.scss';
 import { setCookie } from '../../common/globalCookies';
+import { showMessage } from '../../common/showMessages';
 
-const LoginRegisterPage = (props) => {
+const Page = (props) => {
   const { state, dispatch } = useContext(context);
   const { Header, Logo, PageContent, from } = props,
-        { getRoute } = useGetRoute(),
         [captchaContainer, setCaptchaContainer] = useState(),
         history = useHistory(),
-        [otp, setOtp] = useState({
-          '1': '',
-          '2': '',
-          '3': '',
-          '4': '',
-          '5': '',
-          '6': '',
-        }),
-        [isOtp, showIsOtp] = useState(false);
+        [isOtp, setIsOtp] = useState(false);
 
   const apiCallLogin = props = e => {
     const { username, password, phone, email } = e;
@@ -48,7 +37,7 @@ const LoginRegisterPage = (props) => {
       else if (res.success) {
         setCookie('token', res.data.jwt, 1);
         dispatch({ type: 'userData', payload: { ...res.data, isLoggedIn: true } });
-        history.push(getRoute('contacts'));
+        history.push('/contacts');
       }
     });
   };
@@ -92,67 +81,28 @@ const LoginRegisterPage = (props) => {
       .then((confirmationResult) => {
       // SMS sent. Prompt user to type the code from the message, then sign the
       // user in with confirmationResult.confirm(code).
-        showIsOtp(true);
+        setIsOtp(true);
         window.confirmationResult = confirmationResult;
-        showMessage('OTP has been sent to your mobile number', null, 'success');
+        showMessage('OTP has been sent to your mobile number', null, 'success', setIsOtp, setCaptchaContainer, history );
       // ...
       }).catch(() => {
       // Error; SMS not sent
         setCaptchaContainer();
-        showIsOtp(false);
-        showMessage('Authentication process failed', null, 'error');
+        setIsOtp(false);
+        showMessage('Authentication process failed', null, 'error', setIsOtp, setCaptchaContainer, history );
       });
-  };
-  const onSubmitOTP = (/* e */) => {
-    //e.preventDefault();
-    const code = Object.keys(otp).map(key => otp[key]).join('');
-    window.confirmationResult.confirm(code).then((result) => {
-      // User signed in successfully.
-      const { phoneNumber } = result.user;
-      const isCallbackCall = true;
-      const obj = { url: state.config.baseUrl + state.config.verifyPhone + state.userData._id };
-      const data = { phoneVerified: true };
-      APICallManager.putCall(obj, data, async () => {
-        phoneNumber && showMessage(`${phoneNumber} is verified.`, isCallbackCall, 'success');
-      });
-
-      // ...
-    }).catch((error) => {
-      // User couldn't sign in (bad verification code?)
-      showMessage(error, null, 'error');
-    });
-  };
-
-  const showMessage = (message, isCallbackCall, type) => {
-    notification[type]({
-      message: type = 'error' && 'An Error occurred' || 'Success',
-      description: message,
-      style: getNotificationStyle(type),
-      duration: 0,
-      onClose: () => {
-        if (isCallbackCall) {
-          showIsOtp(false);
-          setCaptchaContainer();
-          history.push(getRoute('login'));
-        }
-      },
-    });
   };
 
   return (
     <>
       {Header}
       <Box className={`d-flex login-main login-main--${from}`}>
-        <Box className="login-main__logo">
-          <Box className="login-main__logo_div">
-            {Logo}
-          </Box>
-          <Box className="mt-3 login-main__form">
+          {Logo}
+          <Box className="login-main__form">
             {captchaContainer}
-            {!isOtp && <FormLoginRegister {...{ from, apiCall: from === 'login' ? apiCallLogin : apiCallRegister }} />
-            || <Checkotp {...{ otp, setOtp, onSubmitOTP }} />}
+            {!isOtp && <Form {...{ from, apiCall: from === 'login' ? apiCallLogin : apiCallRegister }} />
+            || <Checkotp {...{ isOtp, setIsOtp , setCaptchaContainer}} />}
           </Box>
-        </Box>
       </Box>
       <Box>
         {PageContent}
@@ -161,22 +111,4 @@ const LoginRegisterPage = (props) => {
   );
 };
 
-export default LoginRegisterPage;
-
-
-// await firebase.auth().createUserWithEmailAndPassword(email, password)
-//   .then(user => {
-//     if (user) {
-//       user.user.sendEmailVerification().then(() => {
-//         showMessage('Verification link has been sent to your email');
-//       });
-//     }
-//     // firebase.auth().onAuthStateChanged((user) => {
-//     //   user.sendEmailVerification();
-//     //   window.confirmationResultEmail = user;
-//     //   showMessage('Verification link has been sent to your email');
-//     // });
-//   }).catch((e) => {
-//     // Error; SMS not sent
-//     showMessage(e.message);
-//   });
+export default Page;
