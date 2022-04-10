@@ -9,7 +9,7 @@ const PageContent = () => {
 
 const Introduction = () => {
   return <Box className="welcome-page-content__intro d-flex align-items-center flex-column mt-5">
-    <Box className="ms-4 mt-2 p-3 d-flex">
+    {/* <Box className="ms-4 mt-2 p-3 d-flex">
       <Box className="me-2 w-50 p-1 mt-3 p_box d-flex align-items-center">
         <p className="me-1">
             Lorem ipsum dolor, sit amet consectetur adipisicing elit. Animi,
@@ -19,7 +19,7 @@ const Introduction = () => {
         </p>
       </Box>
       <img className="w-50 mt-3" src={Whoweare} alt="whoarewe" />
-    </Box>
+    </Box> */}
   </Box>;
 };
 

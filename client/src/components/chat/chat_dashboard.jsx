@@ -28,7 +28,7 @@ const ChatDashboard = (props) => {
   //classes = useStyles();
 
   const handleMenuClick = (e) => {
-    e.key === '3' && message.info('User successfully logged out.');
+    e.key === '3' && message.info({content: 'User successfully logged out.', duration: 1});
     if (e.key === '3') {
       dispatch({ type: 'LOGOUT' });
       history.push('/login');

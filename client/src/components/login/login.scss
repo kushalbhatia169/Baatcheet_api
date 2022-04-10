@@ -89,6 +89,10 @@
 
     &__button {
       @include default_button(#25c4fe, 94.5%, #2b6cb0);
+
+      &--guest {
+        @include default_button(#EB9937, 94.5%, #e6850f);
+      }
     }
 
     &__link {

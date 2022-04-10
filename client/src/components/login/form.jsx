@@ -19,10 +19,10 @@ const Form = (props) => {
         inputRef = useRef(),
         [phoneError, setPhoneError] = useState(false),
         [fields, setFields] = useState({
-          username: 'kushalJi',
+          username: '',
           email: 'kushalbhatia169@gmail.com',
           phone: '8127717273',
-          password: 'Baatcheet@735',
+          password: '',
           confirmPassword: 'Baatcheet@735',
         }),
         hasValidEmail = (value) => /\S+@\S+\.\S+/i.test(value),
@@ -93,6 +93,10 @@ const Form = (props) => {
             }
           }
         };
+        const getGuestUserCredentials = () => {
+          setStateData('username', 'kushalJi');
+          setStateData('password', 'Baatcheet@735');
+        }
 
   return (
     <form className="login-main__form_div" onSubmit={handleSubmit(() => onSubmit())}>
@@ -132,6 +136,11 @@ const Form = (props) => {
         onClick={() => { from === 'register' && phone_Number_Check() }}>
         {from === 'register' ? 'Register' : 'Login'}
       </Button>
+      {from === 'login' && <Button type="button" className="login-main__form_div__button login-main__form_div__button--guest" variant="outlined"
+      title={'Guest User Credentials'}
+        onClick={() => {getGuestUserCredentials()}}>
+        Guest User Credentials
+      </Button>}
       <div className='d-flex w-100 ms-3 mb-3'>
         <Link className={"login-main__form_div__link ms-2 justify-content-center d-flex" + (from === 'register' ? ' login-main__form_div__link--register' : '')}
           to={{ pathname: from === 'login' ? '/register' : '/login', from: from === 'login' ? 'login' : 'register' }}>
