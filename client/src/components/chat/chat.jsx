@@ -49,7 +49,7 @@ const Chat = (props) => {
         APICallManager.putCall(obj, data, (res) => {
           const { data } = res;
           console.log(data);
-          socket.emit('chat message', {
+          socket.emit('new message', {
             message: data.message,
             user: state.userData.username,
             id: data.msgId,
@@ -57,8 +57,8 @@ const Chat = (props) => {
             recieverId: data.recieverId,
             isRead: data.isRead,
             users: [
-              {senderId: data.senderId, recieverId:null},
-              {recieverId: data.recieverId, senderId: null},
+              {_id: data.senderId},
+              {_id: data.recieverId},
             ]
           });
           setChatState(prevState => ({ ...prevState, searchVal: '' }));
@@ -114,7 +114,7 @@ const Chat = (props) => {
             },
           ] }));
         });
-        socket.emit("join chat", friend.userId);
+        socket.emit("join chat", '1');
         setCanShowLoader(false);
         scrollIntoView();
       });
@@ -126,21 +126,21 @@ const Chat = (props) => {
     //   // eslint-disable-next-line no-console
     //   console.log(message);
     // });
-      socket?.on('Receive Message', dataFromServer => {
-        console.log(dataFromServer);
-        setChatState(prevState => ({ ...prevState, messages: [
-          ...prevState.messages,
-          {
-            id: dataFromServer.msgId,
-            msg: dataFromServer.message,
-            user: dataFromServer.user,
-            senderId: dataFromServer.senderId,
-            recieverId: dataFromServer.recieverId,
-            isRead: dataFromServer.isRead,
-          },
-        ] }));
-        //scrollIntoView();
-      });
+    socket?.on('message received', dataFromServer => {
+      console.log(dataFromServer);
+      setChatState(prevState => ({ ...prevState, messages: [
+        ...prevState.messages,
+        {
+          id: dataFromServer.msgId,
+          msg: dataFromServer.message,
+          user: dataFromServer.user,
+          senderId: dataFromServer.senderId,
+          recieverId: dataFromServer.recieverId,
+          isRead: dataFromServer.isRead,
+        },
+      ] }));
+      //scrollIntoView();
+    });
 
   }, [socket]);
 
