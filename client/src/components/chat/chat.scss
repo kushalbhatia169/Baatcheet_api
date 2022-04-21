@@ -79,7 +79,7 @@
     margin-bottom: 10px;
 
     &__messageDiv {
-      height: 350px;
+      height: 370px;
       overflow-x: hidden;
       overflow-y: scroll;
       display: flex;
@@ -147,6 +147,17 @@
 
         &:not(:first-child) {
           margin-top: 15px;
+        }
+      }
+
+      &--selected {
+        .ant-list-item-meta {
+          background-color: #38B2AC;
+        }
+
+        .ant-list-item-meta-title>a,
+        .ant-list-item-meta-description {
+          color: #fff;
         }
       }
     }

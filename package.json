@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.bundle.js",
     "build": "webpack",
-    "dev": "node ./server.js localhost 3090",
+    "dev": "nodemon ./server.js localhost 3090",
     "dev_socket": "node ./index.js localhost 3080",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },

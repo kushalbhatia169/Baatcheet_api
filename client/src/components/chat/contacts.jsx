@@ -6,7 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { List, Avatar, Button } from 'antd';
 import APICallManager from '../../services/api_manager';
 
-const Contacts = () => {
+const Contacts = (props) => {
   const { state, dispatch } = useContext(context);
   const [_isMounted, _setIsMounted] = useState(true);
   useEffect(() => {
@@ -33,7 +33,11 @@ const Contacts = () => {
             <AddIcon className="me-2 mb-2"/>
           </Button>
         </Box>
-        <Box className="main-chat__contacts__lists">
+        <Box className={`main-chat__contacts__lists ${state.friends && state.friends.map((friend) => {
+            if (friend._id === props?.userId) {
+              return 'main-chat__contacts__lists--selected'
+            }
+          })}`}>
           <List
             className=""
             size="large"
@@ -42,8 +46,9 @@ const Contacts = () => {
             dataSource={state?.friends}
             renderItem={item => <List.Item.Meta
               avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
-              title={<Link to={{ pathname: `/chat/${item.username}`, from: 'chatDashboard' }}
-                style={{ textTransform: 'capitalize', color: 'purple' }}>
+              title={<Link to={{ pathname: `/chat/${item._id}`, from: 'chatDashboard',
+                username: item.username, }}
+                style={{ textTransform: 'capitalize' }}>
                 {item.username}
               </Link>}
               description="Ant Design, a design language for background applications"

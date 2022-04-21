@@ -26,11 +26,12 @@ const Chat = (props) => {
   const [chatState, setChatState] = useState({
     messages: [],
   });
-  const { match: { params: { id } }, location: { from } } = props;
+  const { match: { params: { id: userId } }, location: { from, username: id } } = props;
   const { state/* , dispatch */ } = useContext(context);
   // const [socket, setSocket] = useState(null);
 
   const [socketConnected, setSocketConnected] = useState(false);
+  const [roomId, setRoomId] = useState('');
   const [canShowLoader, setCanShowLoader] = useState(true);
   const messageRef = useRef(createRef());
 
@@ -56,23 +57,21 @@ const Chat = (props) => {
             senderId: data.senderId,
             recieverId: data.recieverId,
             isRead: data.isRead,
-            users: [
-              {_id: data.senderId},
-              {_id: data.recieverId},
-            ]
+            roomId: data.recieverId+'|'+data.senderId,
           });
           setChatState(prevState => ({ ...prevState, searchVal: '' }));
-          setChatState(prevState => ({ ...prevState, messages: [
-            ...prevState.messages,
-            {
-              id: data.msgId,
-              msg: data.message,
-              user: data.senderId === state.userData._id ? state.userData.username : id,
-              senderId: data.senderId,
-              recieverId: data.recieverId,
-              isRead: data.isRead,
-            },
-          ] }));
+          // setChatState(prevState => ({ ...prevState, messages: [
+          //   ...prevState.messages,
+          //   {
+          //     id: data.msgId,
+          //     msg: data.message,
+          //     user: data.senderId === state.userData._id ? state.userData.username : id,
+          //     senderId: data.senderId,
+          //     recieverId: data.recieverId,
+          //     isRead: data.isRead,
+          //   },
+          // ] }));
+          // scrollIntoView();
           })
         }
       }
@@ -85,7 +84,7 @@ const Chat = (props) => {
   };
 
   const scrollIntoView = () => {
-    // messageRef?.current?.scrollIntoView({ behavior: 'smooth' });
+    messageRef?.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -101,26 +100,30 @@ const Chat = (props) => {
       const data = { clientId: state.userData._id, userId: friend.userId };
       APICallManager.postCall(obj, data, async (res) => {
         const { data } = res;
+        const chatData = [];
         data.map((dataFromServer) => {
-          setChatState(prevState => ({ ...prevState, messages: [
-            ...prevState.messages,
-            {
-              id: dataFromServer.chats._id,
-              msg: dataFromServer.chats.msg,
-              user: dataFromServer.senderId === state.userData._id ? state.userData.username : id,
-              senderId: dataFromServer.senderId,
-              recieverId: dataFromServer.recieverId,
-              isRead: dataFromServer.isRead,
-            },
-          ] }));
+          chatData.push({
+            id: dataFromServer.chats._id,
+            msg: dataFromServer.chats.msg,
+            user: dataFromServer.senderId === state.userData._id ? state.userData.username : id,
+            senderId: dataFromServer.senderId,
+            recieverId: dataFromServer.recieverId,
+            isRead: dataFromServer.isRead,
+          });
         });
-        socket.emit("join chat", '1');
+        setChatState(prevState => ({ ...prevState, messages: [
+          ...prevState.messages,
+          ...chatData,
+        ]}));
+        let room_Id = state.userData._id+'|'+friend.userId;
+        socket.emit("join chat", room_Id);
+        setRoomId(room_Id);
         setCanShowLoader(false);
         scrollIntoView();
       });
     }
   }, [canShowLoader]);
-
+  console.log('roomId', roomId);
   useEffect(() => {
     // socket?.on('message', message => {
     //   // eslint-disable-next-line no-console
@@ -139,14 +142,14 @@ const Chat = (props) => {
           isRead: dataFromServer.isRead,
         },
       ] }));
-      //scrollIntoView();
+      scrollIntoView();
     });
 
-  }, [socket]);
+  }, []);
 
   return (
     <ChatDashboard active="chats">
-      <Contacts/>
+      <Contacts userId={userId}/>
       <Box className="m-3 main-chat__chats">
         <Box className="d-flex justify-content-start w-100 mb-3 mt-2">
           {state.friends && state.friends.map((friend) => {
@@ -181,10 +184,10 @@ const Chat = (props) => {
           <div ref={messageRef}></div>,
           </Box>
           <TextArea
-            rows={2}
+            rows={1}
             className="m-2"
             defaultValue={!chatState.searchVal ? '' : chatState.searchVal}
-            style={{backgroundColor: 'rgb(232, 232, 232)', width: '98%'}}
+            style={{backgroundColor: '#E0E0E0', width: '98%', borderRadius: '0.5rem'}}
             placeholder="Enter a message"
             value={chatState.searchVal}
             size="large"

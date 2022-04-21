@@ -9,6 +9,7 @@ const port = process.env.PORT || 8000;
 const cors = require('cors');
 const db = require('./models/index');
 require('dotenv').config();   //to read the .env file
+
 // require('dotenv').config({path: __dirname + '/.env'});
 const userRouter = require('./routes/router');
 const corsOptions = {
@@ -26,6 +27,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, {
+  pingTimeout: 60000,
   cors: {
     origin: '*',
   }
@@ -49,32 +51,33 @@ server.listen(port, () => {
 io.on('connection', (socket) => {
   console.log('Client connected to the WebSocket');
   io.emit('message', 'Hello from the server');
-
-  // Emitting a new message. Will be consumed by the client
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
+  socket.on("setup", (userData) => {
+    socket.join(userData._id);
+    socket.emit("connected");
   });
 
-  socket.on('chat message', async (clientData) => {
-    console.log('Message from client: ', clientData);
-    const saveMsg = new SaveMessage();
+  socket.on("join chat", (room) => {
+    socket.join(room);
+    console.log("User Joined Room: " + room);
+  });
+  // Emitting a new message. Will be consumed by the client
+  // socket.on('disconnect', () => {
+  //   console.log('Client disconnected');
+  // });
+
+  socket.on('new message', async (clientData) => {
     try {
-      const messageData = {
-        message: clientData.msg,
+
+      const newMessageRecieved = {
         senderId: clientData.senderId,
         recieverId: clientData.recieverId,
+        msgId: clientData.id,
+        message: clientData.message,
+        user: clientData.user,
+        isRead: false,
       }
-      await saveMsg.saveMessage(messageData)
-        .then((id) => {
-          console.log(id)
-          io.emit('chat message', {
-            msgId: id, message: clientData.msg, user: clientData.user,
-            senderId: clientData.senderId, recieverId: clientData.recieverId
-          });
-        })
-        .catch((err) => {
-          throw new Error(err);
-        });
+      io.to(clientData.roomId).emit("message received", newMessageRecieved);
+      io.to(`${clientData.senderId}|${clientData.recieverId}`).emit("message received", newMessageRecieved);
     } catch (error) {
       console.log(error);
     }

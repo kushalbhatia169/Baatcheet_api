@@ -14,17 +14,18 @@ const crypto = require('crypto');
 const AddNewContact = require('../controllers/AddNewContact');
 const GetContacts = require('../controllers/GetContacts');
 const GetChats = require('../controllers/GetChats');
+const SaveMessage = require('../controllers/SaveMessage');
 const router = express.Router();
 
-router.get('/login', middleware.isAuthenticated, async(req, res) => {
+router.get('/login', middleware.isAuthenticated, async (req, res) => {
     const userLogin = new UserLogin();
     const status = await userLogin.aunthenticateUser(req.username, req.password);
     try {
-        if(status instanceof Error) {
-            if(status.message.split(' ').find(word => word.includes('verify'))) {
+        if (status instanceof Error) {
+            if (status.message.split(' ').find(word => word.includes('verify'))) {
                 const _id = status.message.split('|')[1];
                 const email = status.message.split('|')[2];
-                if(email !== 'false') {
+                if (email !== 'false') {
                     const token = await new Token({
                         userId: _id,
                         token: crypto.randomBytes(32).toString("hex"),
@@ -35,7 +36,7 @@ router.get('/login', middleware.isAuthenticated, async(req, res) => {
                 return res.status(200).json({
                     success: false,
                     message: status.message.split('|')[0],
-                    data:{ _id: _id },
+                    data: { _id: _id },
                 });
             };
             return res.status(200).json({
@@ -43,18 +44,20 @@ router.get('/login', middleware.isAuthenticated, async(req, res) => {
                 message: status.message,
             })
         }
-        if(status){
-            const {_id, username, phoneNumber, email} = status.user;
+        if (status) {
+            const { _id, username, phoneNumber, email } = status.user;
             res.cookie("jwt", status["x-auth-token"], {
                 secure: false,
                 httpOnly: true,
-            }); 
-         
-            return res.status(200).json({ 
-                success: true, 
-                message:"User logged in", 
-                data: {_id, username, phoneNumber, email, 
-                    jwt: status["x-auth-token"],}
+            });
+
+            return res.status(200).json({
+                success: true,
+                message: "User logged in",
+                data: {
+                    _id, username, phoneNumber, email,
+                    jwt: status["x-auth-token"],
+                }
             })
         }
         else {
@@ -74,24 +77,24 @@ router.post('/', async (req, res) => {
     const body = req.body;
     try {
         const status = await userRegistration.createUserData(body),
-        {_id, username, phoneNumber, email} = status;
-        if(status instanceof Error) {
+            { _id, username, phoneNumber, email } = status;
+        if (status instanceof Error) {
             return res.status(200).json({
                 success: false,
                 message: 'User not created!',
-          })
+            })
         }
         const token = await new Token({
             userId: _id,
             token: crypto.randomBytes(32).toString("hex"),
-          }).save();
-      
+        }).save();
+
         const message = `${process.env.BASE_URL}/verify/${_id}/${token.token}`;
         await sendEmail(email, "Please confirm your Email account", message);
-      
+
         return res.status(201).json({
             success: true,
-            data: {_id, username, phoneNumber, email}, 
+            data: { _id, username, phoneNumber, email },
             message: 'An Email sent to your account please verify',
         })
     } catch (error) {
@@ -107,16 +110,16 @@ router.post('/', async (req, res) => {
 router.put("/verify/phone/:id", async (req, res) => {
     const userUpdation = new UserUpdation();
     try {
-      const { id } = req.params;
-      const verify = 'phoneVerify'
-      const status = await userUpdation.updateUser(id, req, verify);
-        if(status instanceof Error) {
+        const { id } = req.params;
+        const verify = 'phoneVerify'
+        const status = await userUpdation.updateUser(id, req, verify);
+        if (status instanceof Error) {
             return res.status(200).json({
                 success: false,
                 message: 'Phone Number not verified!',
             })
         }
-        if(status){
+        if (status) {
             return res.status(201).json({
                 success: true,
                 message: 'Phone number successfully verified!',
@@ -134,32 +137,32 @@ router.get("/verify/:id/:token", async (req, res) => {
     const verifyUserEmail = new VerifyUserEmail();
     try {
         const status = await verifyUserEmail.verifyUserEmail(req);
-        if(status instanceof Error) {
+        if (status instanceof Error) {
             return res.status(200).send("Invalid link");
         }
-        if(!status) throw Error;
+        if (!status) throw Error;
         return res.send("email verified sucessfully");
     } catch (error) {
-      res.status(400).send("An error occured");
+        res.status(400).send("An error occured");
     }
 });
 
-router.put('/:id/update', middleware.isAuthorized, async(req, res)=>{
+router.put('/:id/update', middleware.isAuthorized, async (req, res) => {
     const userUpdation = new UserUpdation();
     const id = req.params.id;
     try {
         const status = await userUpdation.updateUser(id, req);
-        if(status instanceof Error) {
+        if (status instanceof Error) {
             return res.status(200).json({
                 success: false,
-                message:  status.message,
+                message: status.message,
             })
         }
-        if(status){
-            const {_id, username, phoneNumber, email} = status;
+        if (status) {
+            const { _id, username, phoneNumber, email } = status;
             return res.status(201).json({
                 success: true,
-                data: {_id, username, phoneNumber, email},
+                data: { _id, username, phoneNumber, email },
                 message: 'User updated!',
             })
         }
@@ -175,18 +178,18 @@ router.put('/:id/update', middleware.isAuthorized, async(req, res)=>{
     }
 });
 
-router.delete('/:id/delete',middleware.isAuthorized, async(req, res) => {
+router.delete('/:id/delete', middleware.isAuthorized, async (req, res) => {
     const deleteUser = new UserDeletion;
     try {
         const status = await deleteUser.deleteUser(req);
-        if(status instanceof Error) {
+        if (status instanceof Error) {
             return res.status(200).json({
                 status: false,
-                message:  status.message,
+                message: status.message,
             });
         }
         console.log(status)
-        if(status) {
+        if (status) {
             return res.status(201).json({
                 success: true,
                 message: 'user deleted!',
@@ -201,20 +204,20 @@ router.delete('/:id/delete',middleware.isAuthorized, async(req, res) => {
     }
 });
 
-router.get('/users', middleware.isAuthorized, async(req, res)=> {
+router.get('/users', middleware.isAuthorized, async (req, res) => {
     const getAllUsers = new GetAllUsers;
     try {
-        const status = await getAllUsers.getUsers(); 
-        if(status instanceof Error || isEmpty(status)) {
+        const status = await getAllUsers.getUsers();
+        if (status instanceof Error || isEmpty(status)) {
             return res.status(200).json({
                 status: false,
                 message: status.message,
             });
         }
-        if(status) {
+        if (status) {
             return res.status(201).json({
                 success: true,
-                data: {...status},
+                data: { ...status },
                 message: 'fetched all user',
             })
         }
@@ -227,21 +230,21 @@ router.get('/users', middleware.isAuthorized, async(req, res)=> {
     }
 });
 
-router.get('/:id', middleware.isAuthorized, async(req, res)=> {
+router.get('/:id', middleware.isAuthorized, async (req, res) => {
     const getUser = new GetSingleUser();
     try {
         const status = await getUser.getUserById(req);
-        if(status instanceof Error) {
+        if (status instanceof Error) {
             return res.status(200).json({
                 status: false,
                 message: status.message,
             });
         }
-        if(status) {
-            const {_id, username, phoneNumber, email} = status;
+        if (status) {
+            const { _id, username, phoneNumber, email } = status;
             return res.status(201).json({
                 success: true,
-                data: {_id, username, phoneNumber, email},
+                data: { _id, username, phoneNumber, email },
                 message: 'user data!',
             })
         }
@@ -254,21 +257,21 @@ router.get('/:id', middleware.isAuthorized, async(req, res)=> {
     }
 });
 
-router.post('/addContact',middleware.isAuthorized, async (req, res) => {
+router.post('/addContact', middleware.isAuthorized, async (req, res) => {
     const addContact = new AddNewContact();
     try {
         const status = await addContact.addNewContact(req);
-        if(status instanceof Error) {
+        if (status instanceof Error) {
             console.log(status)
             return res.status(200).json({
                 success: false,
                 message: status.message,
             });
         }
-        if(status) {
+        if (status) {
             return res.status(201).json({
                 success: true,
-                data: {...status?._doc},
+                data: { ...status?._doc },
                 message: 'Contact added!',
             })
         }
@@ -285,17 +288,17 @@ router.post('/addContact',middleware.isAuthorized, async (req, res) => {
     }
 })
 
-router.get('/contacts/:clientId', middleware.isAuthorized, async(req, res)=> {
+router.get('/contacts/:clientId', middleware.isAuthorized, async (req, res) => {
     const getContacts = new GetContacts();
     try {
         const status = await getContacts.getAllContacts(req);
-        if(status instanceof Error) {
+        if (status instanceof Error) {
             return res.status(200).json({
                 status: false,
                 message: status.message,
             });
         }
-        if(status) {
+        if (status) {
             return res.status(201).json({
                 success: true,
                 data: [...status],
@@ -314,18 +317,18 @@ router.get('/contacts/:clientId', middleware.isAuthorized, async(req, res)=> {
     }
 });
 
-router.post('/getChats', middleware.isAuthorized, async(req, res) => {
+router.post('/getChats', middleware.isAuthorized, async (req, res) => {
     const getMsgs = new GetChats();
     try {
         const status = await getMsgs.getChats(req);
-       
-        if(status instanceof Error) {
+
+        if (status instanceof Error) {
             return res.status(200).json({
                 status: false,
                 message: status.message,
             });
         }
-        if(status) {
+        if (status) {
             return res.status(201).json({
                 success: true,
                 data: [...status],
@@ -335,7 +338,7 @@ router.post('/getChats', middleware.isAuthorized, async(req, res) => {
             throw Error;
         }
     }
-    catch (error){
+    catch (error) {
         console.log(error)
         return res.status(400).json({
             success: false,
@@ -345,4 +348,35 @@ router.post('/getChats', middleware.isAuthorized, async(req, res) => {
     }
 });
 
+router.put('/setMessages', middleware.isAuthorized, async (req, res) => {
+
+    const saveMsg = new SaveMessage();
+    try {
+        const status = await saveMsg.saveMessage(req)
+
+        if (status instanceof Error) {
+            return res.status(200).json({
+                status: false,
+                message: status.message,
+            });
+        }
+        if (status) {
+            return res.status(201).json({
+                success: true,
+                data: { ...status },
+            })
+        }
+        else {
+            throw Error('Message not saved!');
+        }
+    }
+    catch (error) {
+        console.log(error)
+        return res.status(400).json({
+            success: false,
+            error,
+            message: 'Message not saved!',
+        })
+    }
+});
 module.exports = router
