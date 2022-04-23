@@ -89,7 +89,7 @@ router.post('/', async (req, res) => {
             token: crypto.randomBytes(32).toString("hex"),
         }).save();
 
-        const message = `${process.env.BASE_URL}/verify/${_id}/${token.token}`;
+        const message = `${process.env.BASE_URL || 'http://localhost:8000/api/user'}/verify/${_id}/${token.token}`;
         await sendEmail(email, "Please confirm your Email account", message);
 
         return res.status(201).json({

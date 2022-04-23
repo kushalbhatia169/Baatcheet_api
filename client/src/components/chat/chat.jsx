@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext, useRef, createRef } from 'react';
 import io from 'socket.io-client';
-import { Box, Button } from '@mui/material';
-import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import Box from '@mui/material/Box';
 import { withRouter } from 'react-router-dom';
 // import { useStyles } from '../../style_jsx/styles';
 import { Card, Avatar, Input, Typography, message, Spin } from 'antd';
@@ -10,8 +9,7 @@ import ChatDashboard from './chat_dashboard';
 import APICallManager from '../../services/api_manager';
 import config from '../../config.json';
 import Contacts from './contacts';
-import axios from 'axios';
-import { getCookie } from '../../common/globalCookies';
+import usePrevious from '../../hooks/usePrevious';
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -27,14 +25,12 @@ const Chat = (props) => {
     messages: [],
   });
   const { match: { params: { id: userId } }, location: { from, username: id } } = props;
-  const { state/* , dispatch */ } = useContext(context);
-  // const [socket, setSocket] = useState(null);
-
+  const { state, dispatch } = useContext(context);
   const [socketConnected, setSocketConnected] = useState(false);
-  const [roomId, setRoomId] = useState('');
   const [canShowLoader, setCanShowLoader] = useState(true);
   const messageRef = useRef(createRef());
-
+  let prevUserId = usePrevious({userId, id});
+// console.log(userId, id, canShowLoader, from, prevUserId);
   const onButtonClicked = (value) => {
     console.log(value)
     if (!value.trim()) {
@@ -60,18 +56,18 @@ const Chat = (props) => {
             roomId: data.recieverId+'|'+data.senderId,
           });
           setChatState(prevState => ({ ...prevState, searchVal: '' }));
-          // setChatState(prevState => ({ ...prevState, messages: [
-          //   ...prevState.messages,
-          //   {
-          //     id: data.msgId,
-          //     msg: data.message,
-          //     user: data.senderId === state.userData._id ? state.userData.username : id,
-          //     senderId: data.senderId,
-          //     recieverId: data.recieverId,
-          //     isRead: data.isRead,
-          //   },
-          // ] }));
-          // scrollIntoView();
+          setChatState(prevState => ({ ...prevState, messages: [
+            ...prevState.messages,
+            {
+              id: data.msgId,
+              msg: data.message,
+              user: data.senderId === state.userData._id ? state.userData.username : id,
+              senderId: data.senderId,
+              recieverId: data.recieverId,
+              isRead: data.isRead,
+            },
+          ] }));
+          scrollIntoView();
           })
         }
       }
@@ -88,12 +84,17 @@ const Chat = (props) => {
   };
 
   useEffect(() => {
+    if(prevUserId !== userId) {
+      setCanShowLoader(true);
+      prevUserId = userId;
+    }
+  },[userId]);
+
+  useEffect(() => {
     // setSocket(io(SERVER));
     socket = io(SERVER);
-    console.log(state)
     socket.emit("setup", state?.userData?._id);
     socket.on("connected", () => setSocketConnected(true));
-    console.log('chat socket', from);
     if (from === 'chatDashboard' && canShowLoader) {
       const friend = state.friends.find(friend => friend.username === id);
       const obj = { url: state.config.baseUrl + state.config.getChats };
@@ -111,26 +112,36 @@ const Chat = (props) => {
             isRead: dataFromServer.isRead,
           });
         });
-        setChatState(prevState => ({ ...prevState, messages: [
-          ...prevState.messages,
-          ...chatData,
-        ]}));
+        setChatState(prevState => ({ ...prevState, messages: [ ...chatData ] }));
         let room_Id = state.userData._id+'|'+friend.userId;
         socket.emit("join chat", room_Id);
-        setRoomId(room_Id);
         setCanShowLoader(false);
         scrollIntoView();
       });
     }
   }, [canShowLoader]);
-  console.log('roomId', roomId);
+
   useEffect(() => {
     // socket?.on('message', message => {
     //   // eslint-disable-next-line no-console
     //   console.log(message);
     // });
     socket?.on('message received', dataFromServer => {
-      console.log(dataFromServer);
+      // console.log(dataFromServer);
+      // const friend = state.friends.find(friend => friend.userId !== dataFromServer.recieverId);
+      // if(friend) {
+      //   dispatch({ type: 'ADD_DATA', payload: { key:'notification', data: [
+      //     ...state.notification,
+      //     {
+      //       id: dataFromServer.msgId,
+      //       msg: dataFromServer.message,
+      //       user: dataFromServer.user,
+      //       senderId: dataFromServer.senderId,
+      //       recieverId: dataFromServer.recieverId,
+      //       isRead: dataFromServer.isRead,
+      //     }
+      //   ] } });
+      // }
       setChatState(prevState => ({ ...prevState, messages: [
         ...prevState.messages,
         {
@@ -142,7 +153,7 @@ const Chat = (props) => {
           isRead: dataFromServer.isRead,
         },
       ] }));
-      scrollIntoView();
+      // scrollIntoView();
     });
 
   }, []);
@@ -200,7 +211,6 @@ const Chat = (props) => {
               setChatState(prevState => ({ ...prevState, searchVal: e.target.value }))}
             }
             onKeyPress={event => {
-              console.log(event.key, event.target.value);
               if (event.key === 'Enter') {
                 console.log('enter pressed');
                 event.preventDefault();

@@ -2,7 +2,7 @@
 
 .main-chat {
   $self: &;
-  min-height: 650px;
+  min-height: 600px;
   display: flex;
   flex-direction: column;
 
@@ -141,23 +141,12 @@
       }
 
       .ant-list-item-meta {
-        background-color: rgb(232, 232, 232);
+        // background-color: rgb(232, 232, 232);
         padding: 15px;
         border-radius: .5rem;
 
         &:not(:first-child) {
           margin-top: 15px;
-        }
-      }
-
-      &--selected {
-        .ant-list-item-meta {
-          background-color: #38B2AC;
-        }
-
-        .ant-list-item-meta-title>a,
-        .ant-list-item-meta-description {
-          color: #fff;
         }
       }
     }

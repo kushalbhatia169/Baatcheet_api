@@ -2,8 +2,7 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require("cookie-parser");
 const bodyParser = require('body-parser');
-const GetSingleUserByName = require('./controllers/GetSingleUserByName');
-const SaveMessage = require('./controllers/SaveMessage');
+const GetSingleUserByName = require('./controllers/getSingleUserByName');
 const app = express();
 const port = process.env.PORT || 8000;
 const cors = require('cors');
@@ -77,7 +76,7 @@ io.on('connection', (socket) => {
         isRead: false,
       }
       io.to(clientData.roomId).emit("message received", newMessageRecieved);
-      io.to(`${clientData.senderId}|${clientData.recieverId}`).emit("message received", newMessageRecieved);
+      // io.to(`${clientData.senderId}|${clientData.recieverId}`).emit("message received", newMessageRecieved);
     } catch (error) {
       console.log(error);
     }

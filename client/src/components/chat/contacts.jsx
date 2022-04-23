@@ -9,6 +9,9 @@ import APICallManager from '../../services/api_manager';
 const Contacts = (props) => {
   const { state, dispatch } = useContext(context);
   const [_isMounted, _setIsMounted] = useState(true);
+  const [canShowLoader, setCanShowLoader] = useState(true);
+  const [userId, setUserId] = useState('');
+
   useEffect(() => {
     if (_isMounted) {
       const obj = { url: state.config.baseUrl + state.config.getContacts + state.userData._id };
@@ -16,11 +19,14 @@ const Contacts = (props) => {
         res.data.length > 0 && dispatch({ type: 'ADD_FRIEND', payload: [...res.data] });
       });
     }
+    else if(props?.userId) {
+      setUserId(props.userId);
+    }
     return () => {
       _setIsMounted(false);
     };
-  }, [state]);
-
+  }, [state, props, userId]);
+console.log(userId);
   return (
     // <ChatDashboard active="contacts">
       <Box className="m-3 main-chat__contacts">
@@ -33,11 +39,7 @@ const Contacts = (props) => {
             <AddIcon className="me-2 mb-2"/>
           </Button>
         </Box>
-        <Box className={`main-chat__contacts__lists ${state.friends && state.friends.map((friend) => {
-            if (friend._id === props?.userId) {
-              return 'main-chat__contacts__lists--selected'
-            }
-          })}`}>
+        {<Box className="main-chat__contacts__lists">
           <List
             className=""
             size="large"
@@ -45,16 +47,20 @@ const Contacts = (props) => {
             bordered
             dataSource={state?.friends}
             renderItem={item => <List.Item.Meta
+              style={{ backgroundColor : (item._id === userId && '#38B2AC') || 'rgb(232, 232, 232)' }}
               avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
               title={<Link to={{ pathname: `/chat/${item._id}`, from: 'chatDashboard',
                 username: item.username, }}
-                style={{ textTransform: 'capitalize' }}>
+                style={{ textTransform: 'capitalize', color : (item._id === userId && '#fff') }}>
                 {item.username}
               </Link>}
-              description="Ant Design, a design language for background applications"
+              description={<span
+              style={{ color : (item._id === userId && '#fff') }}>
+             Ant Design, a design language for background applications
+             </span>}
             />}
           />
-        </Box>
+        </Box>}
       </Box>
     // </ChatDashboard>
   );

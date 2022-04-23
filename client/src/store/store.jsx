@@ -6,6 +6,7 @@ import { getValue } from '../common/data_storage';
 const initialState = {
   userData: getValue('userData') || '',
   config,
+  notifications: [],
 };
 
 export const context = createContext(initialState);

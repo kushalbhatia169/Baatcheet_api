@@ -45,6 +45,11 @@ const Reducer = (state, action) => {
         };
       }
 
+    case 'ADD_DATA':
+      return {
+        ...state,
+        [action.payload.key]: action.payload.value,
+      };
     case 'LOGOUT':
       return {
         ...state,

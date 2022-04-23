@@ -32,7 +32,7 @@ const APICallManager = {
       myApi.defaults.headers.common['cookies'] = getCookie('token');
     }
     (async () => {
-      $$('div').css('cursor', 'wait');
+      // $$('div').css('cursor', 'wait');
       await new Promise(resolve => {
         setTimeout(function() {
           resolve((async () => {
@@ -71,7 +71,7 @@ const APICallManager = {
     }
     const payload = data;
     (async () => {
-      $$('div').css('cursor', 'wait');
+      // $$('div').css('cursor', 'wait');
       await new Promise((resolve) => {
         setTimeout(function() {
           resolve((async () => {
@@ -115,7 +115,7 @@ const APICallManager = {
     const payload = data;
     console.log(payload, obj);
     (async () => {
-      $$('div').css('cursor', 'wait');
+      // $$('div').css('cursor', 'wait');
       await new Promise((resolve) => {
         setTimeout(function() {
           resolve((async () => {
@@ -153,7 +153,7 @@ const APICallManager = {
     }
     const payload = {};
     (async () => {
-      $$('div').css('cursor', 'wait');
+      // $$('div').css('cursor', 'wait');
       await new Promise((resolve) => {
         setTimeout(function() {
           resolve((async () => {

@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import io from 'socket.io-client';
-import { Box, Button } from '@mui/material';
-import ChatTwoToneIcon from '@mui/icons-material/ChatTwoTone';
-import PeopleAltTwoToneIcon from '@mui/icons-material/PeopleAltTwoTone';
-import StarTwoToneIcon from '@mui/icons-material/StarTwoTone';
-import AnimationTwoToneIcon from '@mui/icons-material/AnimationTwoTone';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import { withRouter, useHistory } from 'react-router-dom';
 
 // import { useStyles } from '../../style_jsx/styles';
@@ -109,18 +107,19 @@ const ChatDashboard = (props) => {
             <span style={{fontSize: 16}}>Search User</span>
 
           </Button>
-        {/* <AutoComplete
+        <AutoComplete
           className="w-50"
           placeholder="Enter an user name to search and add in your contacts"
           onSelect={onSelect}
           onSearch={onSearch}
           onBlur={() => setOptions([])}
-          options={options} />*/}
+          options={options} />
            <Text  id="main-heading" type="secondary" className="ms-3 mb-3"
             style={{ fontSize: '24px', textTransform: 'capitalize', color:'black' }}>
             ChatBot!
           </Text>
         <Space wrap className="mb-3">
+          <NotificationsIcon className="icon me-2" />
           <Dropdown overlay={menu}>
             <Button>
             <Avatar style={{ color: '#000', backgroundColor: 'rgb(185, 245, 208)', border: '1px solid darkgreen' }}>

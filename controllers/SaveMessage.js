@@ -3,7 +3,7 @@ const MessagesReciever = require('../models/MessagesReciever');
 const Contacts = require('../models/Contacts');
 class SaveMessage {
     async saveMessage(req) {
-        console.log(req.body)
+        // console.log(req.body)
         const { senderId, recieverId, message: clientMessage, isRead } = req.body;
         const userMsg = {
             msg: clientMessage,
