@@ -97,7 +97,7 @@ const ChatDashboard = (props) => {
   const routeActivePage = (activeClass) => {
     history.push(activeClass);
   };
-
+console.log(state.notifications);
   return (
     <Box className="main-chat" id="wrapper">
       <PageHeader className="main-chat__header title">

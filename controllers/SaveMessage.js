@@ -1,6 +1,7 @@
 const Message = require('../models/Message'); 4
 const MessagesReciever = require('../models/MessagesReciever');
 const Contacts = require('../models/Contacts');
+const GetChatId = require('./GetChatId');
 class SaveMessage {
     async saveMessage(req) {
         // console.log(req.body)
@@ -26,21 +27,29 @@ class SaveMessage {
                 });
                 return await messageReciever
                     .save()
-                    .then(() => {
+                    .then(async () => {
                         console.log('Message saved');
-                        return {
-                            senderId, recieverId, message: clientMessage, isRead,
-                            users: messageReciever.users
-                        };
+                        const getChatId = new GetChatId(senderId, recieverId);
+                        return await getChatId.getChatId()
+                            .then(id => {
+                                return {
+                                    senderId, recieverId, message: clientMessage, isRead,
+                                    users: messageReciever.users, chatId: id
+                                }
+                            })
+                            .catch(err => {
+                                throw new Error(err);
+                            });
                     })
                     .catch((e) => {
                         console.log(e);
-                        return false;
+                        return e;
                     });
 
             })
             .catch(err => {
                 console.log(err);
+                return err;
             });
     }
 }

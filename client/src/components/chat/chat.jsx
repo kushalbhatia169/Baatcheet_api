@@ -24,7 +24,7 @@ const Chat = (props) => {
   const [chatState, setChatState] = useState({
     messages: [],
   });
-  const { match: { params: { id: userId } }, location: { from, username: id } } = props;
+  const { match: { params: { id: userId } }, location: { from, username: id, friend_Id } } = props;
   const { state, dispatch } = useContext(context);
   const [socketConnected, setSocketConnected] = useState(false);
   const [canShowLoader, setCanShowLoader] = useState(true);
@@ -39,10 +39,8 @@ const Chat = (props) => {
     }
     else {
       try {
-        const friend = state.friends.find(friend => friend.username === id);
-        if(friend) {
         const obj = {url: state.config.baseUrl + '/setMessages' };
-        const data = { senderId: state.userData._id, recieverId: friend.userId, message: value?.trim(), isRead: false };
+        const data = { senderId: state.userData._id, recieverId: friend_Id, message: value?.trim(), isRead: false };
         APICallManager.putCall(obj, data, (res) => {
           const { data } = res;
           console.log(data);
@@ -54,6 +52,7 @@ const Chat = (props) => {
             recieverId: data.recieverId,
             isRead: data.isRead,
             roomId: data.recieverId+'|'+data.senderId,
+            chatId: data.chatId,
           });
           setChatState(prevState => ({ ...prevState, searchVal: '' }));
           setChatState(prevState => ({ ...prevState, messages: [
@@ -69,7 +68,6 @@ const Chat = (props) => {
           ] }));
           scrollIntoView();
           })
-        }
       }
       catch (error) {
         message.error({content: 'Failed to send the Message', duration: 2});
@@ -96,9 +94,8 @@ const Chat = (props) => {
     socket.emit("setup", state?.userData?._id);
     socket.on("connected", () => setSocketConnected(true));
     if (from === 'chatDashboard' && canShowLoader) {
-      const friend = state.friends.find(friend => friend.username === id);
       const obj = { url: state.config.baseUrl + state.config.getChats };
-      const data = { clientId: state.userData._id, userId: friend.userId };
+      const data = { clientId: state.userData._id, userId: friend_Id };
       APICallManager.postCall(obj, data, async (res) => {
         const { data } = res;
         const chatData = [];
@@ -113,46 +110,49 @@ const Chat = (props) => {
           });
         });
         setChatState(prevState => ({ ...prevState, messages: [ ...chatData ] }));
-        let room_Id = state.userData._id+'|'+friend.userId;
+        let room_Id = state.userData._id+'|'+friend_Id;
         socket.emit("join chat", room_Id);
         setCanShowLoader(false);
         scrollIntoView();
       });
     }
   }, [canShowLoader]);
-
+console.log(state.friends, props);
   useEffect(() => {
     // socket?.on('message', message => {
     //   // eslint-disable-next-line no-console
     //   console.log(message);
     // });
     socket?.on('message received', dataFromServer => {
-      // console.log(dataFromServer);
-      // const friend = state.friends.find(friend => friend.userId !== dataFromServer.recieverId);
-      // if(friend) {
-      //   dispatch({ type: 'ADD_DATA', payload: { key:'notification', data: [
-      //     ...state.notification,
-      //     {
-      //       id: dataFromServer.msgId,
-      //       msg: dataFromServer.message,
-      //       user: dataFromServer.user,
-      //       senderId: dataFromServer.senderId,
-      //       recieverId: dataFromServer.recieverId,
-      //       isRead: dataFromServer.isRead,
-      //     }
-      //   ] } });
-      // }
-      setChatState(prevState => ({ ...prevState, messages: [
-        ...prevState.messages,
-        {
-          id: dataFromServer.msgId,
-          msg: dataFromServer.message,
-          user: dataFromServer.user,
-          senderId: dataFromServer.senderId,
-          recieverId: dataFromServer.recieverId,
-          isRead: dataFromServer.isRead,
-        },
-      ] }));
+      console.log(userId, dataFromServer.chatId, dataFromServer, window.location.href);
+      if(window.location.href.indexOf(dataFromServer.chatId) === -1) {
+        dispatch({ type: 'ADD_DATA', payload: { key:'notifications', value: [
+          ...state.notifications,
+          {
+            id: dataFromServer.msgId,
+            msg: dataFromServer.message,
+            user: dataFromServer.user,
+            senderId: dataFromServer.senderId,
+            recieverId: dataFromServer.recieverId,
+            isRead: dataFromServer.isRead,
+          }
+        ] } });
+        return;
+      }
+      else {
+        setChatState(prevState => ({ ...prevState, messages: [
+          ...prevState.messages,
+          {
+            id: dataFromServer.msgId,
+            msg: dataFromServer.message,
+            user: dataFromServer.user,
+            senderId: dataFromServer.senderId,
+            recieverId: dataFromServer.recieverId,
+            isRead: dataFromServer.isRead,
+          },
+        ] }));
+      }
+
       // scrollIntoView();
     });
 
@@ -163,14 +163,10 @@ const Chat = (props) => {
       <Contacts userId={userId}/>
       <Box className="m-3 main-chat__chats">
         <Box className="d-flex justify-content-start w-100 mb-3 mt-2">
-          {state.friends && state.friends.map((friend) => {
-            if (friend.username === id) {
-              return <Text id="main-heading" type="secondary" className="ms-3" key={id}
-                style={{ fontSize: '30px', textTransform: 'capitalize' }}>
-                {friend.username}
-              </Text>;
-            }
-          })}
+          <Text id="main-heading" type="secondary" className="ms-3" key={id}
+            style={{ fontSize: '30px', textTransform: 'capitalize' }}>
+            {id}
+          </Text>
         </Box>
         {!canShowLoader ? <Box id="messages"
           className="w-100 main-chat__chatBox">

@@ -26,7 +26,7 @@ const Contacts = (props) => {
       _setIsMounted(false);
     };
   }, [state, props, userId]);
-console.log(userId);
+
   return (
     // <ChatDashboard active="contacts">
       <Box className="m-3 main-chat__contacts">
@@ -50,7 +50,7 @@ console.log(userId);
               style={{ backgroundColor : (item._id === userId && '#38B2AC') || 'rgb(232, 232, 232)' }}
               avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
               title={<Link to={{ pathname: `/chat/${item._id}`, from: 'chatDashboard',
-                username: item.username, }}
+                username: item.username, friend_Id: item.userId }}
                 style={{ textTransform: 'capitalize', color : (item._id === userId && '#fff') }}>
                 {item.username}
               </Link>}

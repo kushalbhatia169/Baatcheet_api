@@ -66,13 +66,13 @@ io.on('connection', (socket) => {
 
   socket.on('new message', async (clientData) => {
     try {
-
       const newMessageRecieved = {
         senderId: clientData.senderId,
         recieverId: clientData.recieverId,
         msgId: clientData.id,
         message: clientData.message,
         user: clientData.user,
+        chatId: clientData.chatId,
         isRead: false,
       }
       io.to(clientData.roomId).emit("message received", newMessageRecieved);
