@@ -14,13 +14,15 @@ import './chat.scss';
 import 'antd/dist/antd.css';
 import APICallManager from '../../services/api_manager';
 import config from '../../config.json';
+import {useSelector, useDispatch} from 'react-redux';
 
 const { Text } = Typography;
 const SERVER = config.wsServer;
 
 const ChatDashboard = (props) => {
   const [options, setOptions] = useState([]);
-  const { state, dispatch } = useContext(context);
+  const { state: stateContext, dispatch: dispatchContext } = useContext(context);
+  const user_Data = useSelector(state => state.user.value);
   const { children, active } = props;
   const history = useHistory();
   //classes = useStyles();
@@ -28,7 +30,7 @@ const ChatDashboard = (props) => {
   const handleMenuClick = (e) => {
     e.key === '3' && message.info({content: 'User successfully logged out.', duration: 1});
     if (e.key === '3') {
-      dispatch({ type: 'LOGOUT' });
+      dispatchContext({ type: 'LOGOUT' });
       history.push('/login');
       //window.location.reload();
     }
@@ -59,7 +61,7 @@ const ChatDashboard = (props) => {
     });
 
     socket?.on('getUser', dataFromServer => {
-      if (dataFromServer.user !== state.userData.username && dataFromServer.user !== '') {
+      if (dataFromServer.user !== stateContext.userData.username && dataFromServer.user !== '') {
         setOptions([{ value: dataFromServer.user, _id: dataFromServer._id }]);
       }
     });
@@ -67,8 +69,8 @@ const ChatDashboard = (props) => {
 
   const onSearch = (searchText) => {
     if (searchText.length > 0) {
-      if (state.userData.username !== searchText) {
-        socket.emit('getUser', { searchText: searchText, user: { ...state.userData } });
+      if (stateContext.userData.username !== searchText) {
+        socket.emit('getUser', { searchText: searchText, user: { ...stateContext.userData } });
       }
     }
     else {
@@ -78,15 +80,15 @@ const ChatDashboard = (props) => {
 
   const onSelect = (userData) => {
     const friend = {
-      clientId: state.userData._id,
+      clientId: stateContext.userData._id,
       username: userData,
       userId: options[0]._id,
       chats: [],
     };
-    const obj = { url: state.config.baseUrl + state.config.addContact };
+    const obj = { url: stateContext.config.baseUrl + stateContext.config.addContact };
     const data = { ...friend };
     APICallManager.postCall(obj, data, async (res) => {
-      dispatch({ type: 'ADD_FRIEND', payload: { ...res.data } });
+      dispatchContext({ type: 'ADD_FRIEND', payload: { ...res.data } });
       history.push({
         pathname: '/chat/' + userData,
         from: 'chatDashboard',
@@ -97,7 +99,7 @@ const ChatDashboard = (props) => {
   const routeActivePage = (activeClass) => {
     history.push(activeClass);
   };
-console.log(state.notifications);
+console.log(user_Data, stateContext.userData);
   return (
     <Box className="main-chat" id="wrapper">
       <PageHeader className="main-chat__header title">
@@ -123,7 +125,7 @@ console.log(state.notifications);
           <Dropdown overlay={menu}>
             <Button>
             <Avatar style={{ color: '#000', backgroundColor: 'rgb(185, 245, 208)', border: '1px solid darkgreen' }}>
-            {state.userData.username && state.userData.username[0].toUpperCase() || 'U'}
+            {stateContext.userData.username && stateContext.userData.username[0].toUpperCase() || 'U'}
           </Avatar> <DownOutlined className="ms-2" />
             </Button>
           </Dropdown>

@@ -9,11 +9,14 @@ import Checkotp from './checkOtp';
 import './login.scss';
 import { setCookie } from '../../common/globalCookies';
 import { showMessage } from '../../common/showMessages';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../features/userSlice';
 
 const Page = (props) => {
-  const { state, dispatch } = useContext(context);
+  const { state, dispatch: dispatchContext } = useContext(context);
   const { Header, Logo, PageContent, from } = props,
         [captchaContainer, setCaptchaContainer] = useState(),
+        dispatch = useDispatch(),
         history = useHistory(),
         [isOtp, setIsOtp] = useState(false);
 
@@ -29,14 +32,17 @@ const Page = (props) => {
         isPhone && setCaptchaContainer(<div id="recaptcha-container"></div>);
         isPhone && onSignInSubmit(phone.replace(/\D+/g, ''), email, password, username, notVerify);
         !isPhone && isEmail && APICallManager.postCall(obj, data, async (res) => {
-          dispatch({ type: 'userData', payload: { ...res.data } });
+          dispatchContext({ type: 'userData', payload: { ...res.data } });
+          dispatch(setUser({...res.data}));
         });
-        !isEmail && dispatch({ type: 'userData', payload: { ...res.data } });
+        !isEmail && dispatchContext({ type: 'userData', payload: { ...res.data } });
+        !isEmail && dispatch(setUser({...res.data}));
         return;
       }
       else if (res.success) {
         setCookie('token', res.data.jwt, 1);
-        dispatch({ type: 'userData', payload: { ...res.data, isLoggedIn: true } });
+        dispatchContext({ type: 'userData', payload: { ...res.data, isLoggedIn: true } });
+        dispatch(setUser({...res.data, isLoggedIn: true}));
         history.push('/chats');
       }
     });
@@ -44,7 +50,8 @@ const Page = (props) => {
 
   const apiCallRegister = props = e => {
     const { username, password, phone, email } = e;
-    dispatch({ type: 'userData', payload: { ...e } });
+    dispatchContext({ type: 'userData', payload: { ...e } });
+    dispatch({...e});
     setCaptchaContainer(<div id="recaptcha-container"></div>);
     onSignInSubmit(phone.replace(/\D+/g, ''), email, password, username);
   };
@@ -71,7 +78,7 @@ const Page = (props) => {
       if (res.success) {
         await sendOtp(phoneNumber, appVerifier);
       }
-      dispatch({ type: 'userData', payload: { ...res.data } });
+      dispatchContext({ type: 'userData', payload: { ...res.data } });
     });
     notVerify && await sendOtp(phoneNumber, appVerifier);
   };
