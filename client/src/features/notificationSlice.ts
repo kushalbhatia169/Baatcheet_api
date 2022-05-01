@@ -9,14 +9,14 @@ const notificationSlice = createSlice({
     initialState: [...initialStateValue],
     reducers: {
         setNotification: (state, action) => {
-            const isNotExist = state.findIndex(notification => notification.id === action.payload.id) === -1;
-            if (isNotExist) {
-                const isEmpty = Object.values(state[0]).every(x => (x === null || x === ''));
-                if (isEmpty) {
-                    state.pop();
-                }
-                state.push({ ...action.payload });
+            // const isNotExist = state.findIndex(notification => notification.id === action.payload.id) === -1;
+            // if (isNotExist) {
+            const isEmpty = Object.values(state[0]).every(x => (x === null || x === ''));
+            if (isEmpty) {
+                state.pop();
             }
+            state.push({ ...action.payload });
+            // }
         },
         removeNotification: (state, action) => {
             const index = state.findIndex(notification => notification.id === action.payload.id);
