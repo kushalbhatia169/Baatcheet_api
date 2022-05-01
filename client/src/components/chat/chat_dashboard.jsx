@@ -10,27 +10,31 @@ import { Menu, Dropdown, message, Space, Avatar, Typography, PageHeader, AutoCom
 import { DownOutlined, SettingOutlined, LogoutOutlined, PushpinTwoTone,
   GiftOutlined, SearchOutlined } from '@ant-design/icons';
 import { context } from '../../store/store';
-import './chat.scss';
-import 'antd/dist/antd.css';
 import APICallManager from '../../services/api_manager';
 import config from '../../config.json';
 import {useSelector, useDispatch} from 'react-redux';
+import { setFriend } from '../../features/friendSlice';
+import { logout } from '../../features/userSlice';
+import './chat.scss';
+import 'antd/dist/antd.css';
 
 const { Text } = Typography;
 const SERVER = config.wsServer;
 
 const ChatDashboard = (props) => {
   const [options, setOptions] = useState([]);
-  const { state: stateContext, dispatch: dispatchContext } = useContext(context);
+  const { state: storeState } = useContext(context);
   const user_Data = useSelector(state => state.user.value);
-  const { children, active } = props;
+  const notification = useSelector(state => state.notification);
+  const dispatch = useDispatch();
+  const { children } = props;
   const history = useHistory();
   //classes = useStyles();
 
   const handleMenuClick = (e) => {
     e.key === '3' && message.info({content: 'User successfully logged out.', duration: 1});
     if (e.key === '3') {
-      dispatchContext({ type: 'LOGOUT' });
+      dispatch(logout());
       history.push('/login');
       //window.location.reload();
     }
@@ -61,7 +65,7 @@ const ChatDashboard = (props) => {
     });
 
     socket?.on('getUser', dataFromServer => {
-      if (dataFromServer.user !== stateContext.userData.username && dataFromServer.user !== '') {
+      if (dataFromServer.user !== user_Data.username && dataFromServer.user !== '') {
         setOptions([{ value: dataFromServer.user, _id: dataFromServer._id }]);
       }
     });
@@ -69,8 +73,8 @@ const ChatDashboard = (props) => {
 
   const onSearch = (searchText) => {
     if (searchText.length > 0) {
-      if (stateContext.userData.username !== searchText) {
-        socket.emit('getUser', { searchText: searchText, user: { ...stateContext.userData } });
+      if (user_Data.username !== searchText) {
+        socket.emit('getUser', { searchText: searchText, user: { ...user_Data } });
       }
     }
     else {
@@ -80,15 +84,15 @@ const ChatDashboard = (props) => {
 
   const onSelect = (userData) => {
     const friend = {
-      clientId: stateContext.userData._id,
+      clientId: user_Data._id,
       username: userData,
       userId: options[0]._id,
       chats: [],
     };
-    const obj = { url: stateContext.config.baseUrl + stateContext.config.addContact };
+    const obj = { url: storeState.config.baseUrl + storeState.config.addContact };
     const data = { ...friend };
     APICallManager.postCall(obj, data, async (res) => {
-      dispatchContext({ type: 'ADD_FRIEND', payload: { ...res.data } });
+      dispatch(setFriend([...res.data]));
       history.push({
         pathname: '/chat/' + userData,
         from: 'chatDashboard',
@@ -96,10 +100,7 @@ const ChatDashboard = (props) => {
     });
   };
 
-  const routeActivePage = (activeClass) => {
-    history.push(activeClass);
-  };
-console.log(user_Data, stateContext.userData);
+  console.log(notification);
   return (
     <Box className="main-chat" id="wrapper">
       <PageHeader className="main-chat__header title">
@@ -121,11 +122,14 @@ console.log(user_Data, stateContext.userData);
             ChatBot!
           </Text>
         <Space wrap className="mb-3">
-          <NotificationsIcon className="icon me-2" />
+          <NotificationsIcon className="icon me-2">
+
+          </NotificationsIcon>
+          {notification.length > 0 && <span className="notification-count">{notification.length}</span>}
           <Dropdown overlay={menu}>
             <Button>
             <Avatar style={{ color: '#000', backgroundColor: 'rgb(185, 245, 208)', border: '1px solid darkgreen' }}>
-            {stateContext.userData.username && stateContext.userData.username[0].toUpperCase() || 'U'}
+            {user_Data.username && user_Data.username[0].toUpperCase() || 'U'}
           </Avatar> <DownOutlined className="ms-2" />
             </Button>
           </Dropdown>

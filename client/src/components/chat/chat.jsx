@@ -10,6 +10,8 @@ import APICallManager from '../../services/api_manager';
 import config from '../../config.json';
 import Contacts from './contacts';
 import usePrevious from '../../hooks/usePrevious';
+import { useSelector, useDispatch } from 'react-redux';
+import { setNotification } from '../../features/notificationSlice';
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -25,7 +27,9 @@ const Chat = (props) => {
     messages: [],
   });
   const { match: { params: { id: userId } }, location: { from, username: id, friend_Id } } = props;
-  const { state, dispatch } = useContext(context);
+  const { state: storeState, dispatch: dispatchContext } = useContext(context);
+  const user_Data = useSelector(state => state.user.value);
+  const dispatch = useDispatch();
   const [socketConnected, setSocketConnected] = useState(false);
   const [canShowLoader, setCanShowLoader] = useState(true);
   const messageRef = useRef(createRef());
@@ -39,14 +43,14 @@ const Chat = (props) => {
     }
     else {
       try {
-        const obj = {url: state.config.baseUrl + '/setMessages' };
-        const data = { senderId: state.userData._id, recieverId: friend_Id, message: value?.trim(), isRead: false };
+        const obj = {url: storeState.config.baseUrl + '/setMessages' };
+        const data = { senderId: user_Data._id, recieverId: friend_Id, message: value?.trim(), isRead: false };
         APICallManager.putCall(obj, data, (res) => {
           const { data } = res;
           console.log(data);
           socket.emit('new message', {
             message: data.message,
-            user: state.userData.username,
+            user: user_Data.username,
             id: data.msgId,
             senderId: data.senderId,
             recieverId: data.recieverId,
@@ -60,7 +64,7 @@ const Chat = (props) => {
             {
               id: data.msgId,
               msg: data.message,
-              user: data.senderId === state.userData._id ? state.userData.username : id,
+              user: data.senderId === user_Data._id ? user_Data.username : id,
               senderId: data.senderId,
               recieverId: data.recieverId,
               isRead: data.isRead,
@@ -72,8 +76,6 @@ const Chat = (props) => {
       catch (error) {
         message.error({content: 'Failed to send the Message', duration: 2});
       }
-
-
     }
   };
 
@@ -91,11 +93,11 @@ const Chat = (props) => {
   useEffect(() => {
     // setSocket(io(SERVER));
     socket = io(SERVER);
-    socket.emit("setup", state?.userData?._id);
+    socket.emit("setup", user_Data?._id);
     socket.on("connected", () => setSocketConnected(true));
     if (from === 'chatDashboard' && canShowLoader) {
-      const obj = { url: state.config.baseUrl + state.config.getChats };
-      const data = { clientId: state.userData._id, userId: friend_Id };
+      const obj = { url: storeState.config.baseUrl + storeState.config.getChats };
+      const data = { clientId: user_Data._id, userId: friend_Id };
       APICallManager.postCall(obj, data, async (res) => {
         const { data } = res;
         const chatData = [];
@@ -103,21 +105,21 @@ const Chat = (props) => {
           chatData.push({
             id: dataFromServer.chats._id,
             msg: dataFromServer.chats.msg,
-            user: dataFromServer.senderId === state.userData._id ? state.userData.username : id,
+            user: dataFromServer.senderId === user_Data._id ? user_Data.username : id,
             senderId: dataFromServer.senderId,
             recieverId: dataFromServer.recieverId,
             isRead: dataFromServer.isRead,
           });
         });
         setChatState(prevState => ({ ...prevState, messages: [ ...chatData ] }));
-        let room_Id = state.userData._id+'|'+friend_Id;
+        let room_Id = user_Data._id+'|'+friend_Id;
         socket.emit("join chat", room_Id);
         setCanShowLoader(false);
         scrollIntoView();
       });
     }
   }, [canShowLoader]);
-console.log(state.friends, props);
+
   useEffect(() => {
     // socket?.on('message', message => {
     //   // eslint-disable-next-line no-console
@@ -126,17 +128,14 @@ console.log(state.friends, props);
     socket?.on('message received', dataFromServer => {
       console.log(userId, dataFromServer.chatId, dataFromServer, window.location.href);
       if(window.location.href.indexOf(dataFromServer.chatId) === -1) {
-        dispatch({ type: 'ADD_DATA', payload: { key:'notifications', value: [
-          ...state.notifications,
-          {
-            id: dataFromServer.msgId,
-            msg: dataFromServer.message,
-            user: dataFromServer.user,
-            senderId: dataFromServer.senderId,
-            recieverId: dataFromServer.recieverId,
-            isRead: dataFromServer.isRead,
-          }
-        ] } });
+        dispatch(setNotification({
+          id: dataFromServer.msgId,
+          msg: dataFromServer.message,
+          user: dataFromServer.user,
+          senderId: dataFromServer.senderId,
+          recieverId: dataFromServer.recieverId,
+          isRead: dataFromServer.isRead,
+        }));
         return;
       }
       else {
@@ -171,15 +170,15 @@ console.log(state.friends, props);
         {!canShowLoader ? <Box id="messages"
           className="w-100 main-chat__chatBox">
           <Box className="w-100 main-chat__chatBox__messageDiv">
-            {chatState.messages && chatState.messages.map(message =>
-            <Card ref={messageRef[id]} key={message.id} style={{ width: 300, margin: '16px 16px 0 16px',
-              backgroundColor: state.userData.username === message.user ? '#BEE3F8' : '#fde3cf',
-              alignSelf: state.userData.username === message.user ? 'flex-end' : 'flex-start',
+            {chatState.messages && chatState.messages.map((message, key) =>
+            <Card ref={messageRef[id]} key={message.id || message+key} style={{ width: 300, margin: '16px 16px 0 16px',
+              backgroundColor: user_Data.username === message.user ? '#BEE3F8' : '#fde3cf',
+              alignSelf: user_Data.username === message.user ? 'flex-end' : 'flex-start',
               borderRadius: '.5rem' }} loading={false}>
               <Meta
                 avatar={
                   <Avatar style={{ color: '#f56a00',
-                    backgroundColor: state.userData.username === message.user ? '#fde3cf' : '#BEE3F8' }}>
+                    backgroundColor: user_Data.username === message.user ? '#fde3cf' : '#BEE3F8' }}>
                     {message.user && message.user[0].toUpperCase() || 'U'}
                   </Avatar>
                 }

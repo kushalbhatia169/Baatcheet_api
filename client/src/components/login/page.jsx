@@ -6,14 +6,14 @@ import { context } from '../../store/store';
 import APICallManager from '../../services/api_manager';
 import firebase from '../../firebase';
 import Checkotp from './checkOtp';
-import './login.scss';
 import { setCookie } from '../../common/globalCookies';
 import { showMessage } from '../../common/showMessages';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../features/userSlice';
+import './login.scss';
 
 const Page = (props) => {
-  const { state, dispatch: dispatchContext } = useContext(context);
+  const { state: storeState } = useContext(context);
   const { Header, Logo, PageContent, from } = props,
         [captchaContainer, setCaptchaContainer] = useState(),
         dispatch = useDispatch(),
@@ -22,7 +22,7 @@ const Page = (props) => {
 
   const apiCallLogin = props = e => {
     const { username, password, phone, email } = e;
-    const obj = { url: state.config.baseUrl + state.config.loginUser };
+    const obj = { url: storeState.config.baseUrl + storeState.config.loginUser };
     const data = { username, password };
     APICallManager.getCall(obj, data, async (res) => {
       const notVerify = res.message.split(' ').find(word => word.includes('verify'));
@@ -32,16 +32,13 @@ const Page = (props) => {
         isPhone && setCaptchaContainer(<div id="recaptcha-container"></div>);
         isPhone && onSignInSubmit(phone.replace(/\D+/g, ''), email, password, username, notVerify);
         !isPhone && isEmail && APICallManager.postCall(obj, data, async (res) => {
-          dispatchContext({ type: 'userData', payload: { ...res.data } });
           dispatch(setUser({...res.data}));
         });
-        !isEmail && dispatchContext({ type: 'userData', payload: { ...res.data } });
         !isEmail && dispatch(setUser({...res.data}));
         return;
       }
       else if (res.success) {
         setCookie('token', res.data.jwt, 1);
-        dispatchContext({ type: 'userData', payload: { ...res.data, isLoggedIn: true } });
         dispatch(setUser({...res.data, isLoggedIn: true}));
         history.push('/chats');
       }
@@ -50,8 +47,7 @@ const Page = (props) => {
 
   const apiCallRegister = props = e => {
     const { username, password, phone, email } = e;
-    dispatchContext({ type: 'userData', payload: { ...e } });
-    dispatch({...e});
+    dispatch(setUser({...e}));
     setCaptchaContainer(<div id="recaptcha-container"></div>);
     onSignInSubmit(phone.replace(/\D+/g, ''), email, password, username);
   };
@@ -72,13 +68,13 @@ const Page = (props) => {
     configureCaptcha();
     const phoneNumber = '+91' + phone;
     const appVerifier = window.recaptchaVerifier;
-    const obj = { url: state.config.baseUrl };
+    const obj = { url: storeState.config.baseUrl };
     const data = { username, password, phoneNumber: parseInt(phone.replace(/\D+/g, '')), email };
     !notVerify && APICallManager.postCall(obj, data, async (res) => {
       if (res.success) {
         await sendOtp(phoneNumber, appVerifier);
       }
-      dispatchContext({ type: 'userData', payload: { ...res.data } });
+      dispatch(setUser({...res.data}));
     });
     notVerify && await sendOtp(phoneNumber, appVerifier);
   };

@@ -5,18 +5,22 @@ import { context } from '../../store/store';
 import AddIcon from '@mui/icons-material/Add';
 import { List, Avatar, Button } from 'antd';
 import APICallManager from '../../services/api_manager';
+import { useSelector, useDispatch } from 'react-redux';
+import { setFriend } from '../../features/friendSlice';
 
 const Contacts = (props) => {
-  const { state, dispatch } = useContext(context);
+  const { state: storeState } = useContext(context);
+  const userData = useSelector(state => state.user.value);
+  const dispatch = useDispatch();
+  const friends = useSelector(state => state.friend);
   const [_isMounted, _setIsMounted] = useState(true);
-  const [canShowLoader, setCanShowLoader] = useState(true);
   const [userId, setUserId] = useState('');
 
   useEffect(() => {
     if (_isMounted) {
-      const obj = { url: state.config.baseUrl + state.config.getContacts + state.userData._id };
+      const obj = { url: storeState.config.baseUrl + storeState.config.getContacts + userData._id };
       APICallManager.getCall(obj, '', async (res) => {
-        res.data.length > 0 && dispatch({ type: 'ADD_FRIEND', payload: [...res.data] });
+        res?.data?.length > 0 && dispatch(setFriend([...res.data]));
       });
     }
     else if(props?.userId) {
@@ -25,7 +29,7 @@ const Contacts = (props) => {
     return () => {
       _setIsMounted(false);
     };
-  }, [state, props, userId]);
+  }, [storeState, props, userId]);
 
   return (
     // <ChatDashboard active="contacts">
@@ -45,7 +49,7 @@ const Contacts = (props) => {
             size="large"
             itemLayout="horizontal"
             bordered
-            dataSource={state?.friends}
+            dataSource={friends}
             renderItem={item => <List.Item.Meta
               style={{ backgroundColor : (item._id === userId && '#38B2AC') || 'rgb(232, 232, 232)' }}
               avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}

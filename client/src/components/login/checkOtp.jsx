@@ -7,11 +7,13 @@ import { context } from '../../store/store';
 import APICallManager from '../../services/api_manager';
 import { useHistory } from 'react-router';
 import { showMessage } from '../../common/showMessages';
+import { useSelector } from 'react-redux';
 
 const Checkotp = (props) => {
   const classes = useStyles(),
         { setIsOtp, setCaptchaContainer } = props,
         { state } = useContext(context),
+        userData = useSelector(state => state.user.value),
         history = useHistory(),
         [otp, setOtp] = useState({
           '1': '',
@@ -33,7 +35,7 @@ const Checkotp = (props) => {
       // User signed in successfully.
       const { phoneNumber } = result.user;
       const isCallbackCall = true;
-      const obj = { url: state.config.baseUrl + state.config.verifyPhone + state.userData._id };
+      const obj = { url: state.config.baseUrl + state.config.verifyPhone + userData._id };
       const data = { phoneVerified: true };
       APICallManager.putCall(obj, data, async () => {
         phoneNumber && showMessage(`${phoneNumber} is verified.`, isCallbackCall, 'success', setIsOtp, setCaptchaContainer, history );
