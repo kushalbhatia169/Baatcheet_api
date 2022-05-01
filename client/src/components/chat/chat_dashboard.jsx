@@ -17,6 +17,7 @@ import { setFriend } from '../../features/friendSlice';
 import { logout } from '../../features/userSlice';
 import './chat.scss';
 import 'antd/dist/antd.css';
+import { Badge, Tab } from '@mui/material';
 
 const { Text } = Typography;
 const SERVER = config.wsServer;
@@ -122,10 +123,11 @@ const ChatDashboard = (props) => {
             ChatBot!
           </Text>
         <Space wrap className="mb-3">
-          <NotificationsIcon className="icon me-2">
-
-          </NotificationsIcon>
-          {notification.length > 0 && <span className="notification-count">{notification.length}</span>}
+          <Badge badgeContent={Object.values(notification[0]).every(x => (x === null || x === '')) ? 0 :
+          notification.length}
+          color="success" className="mt-2 mr-3">
+            <NotificationsIcon style={{ cursor: 'pointer' }}/>
+          </Badge>
           <Dropdown overlay={menu}>
             <Button>
             <Avatar style={{ color: '#000', backgroundColor: 'rgb(185, 245, 208)', border: '1px solid darkgreen' }}>
