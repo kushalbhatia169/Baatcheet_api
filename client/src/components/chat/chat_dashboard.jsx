@@ -1,37 +1,42 @@
 import React, { useState, useEffect, useContext } from 'react';
 import io from 'socket.io-client';
-import { Box, Button } from '@mui/material';
-import ChatTwoToneIcon from '@mui/icons-material/ChatTwoTone';
-import PeopleAltTwoToneIcon from '@mui/icons-material/PeopleAltTwoTone';
-import StarTwoToneIcon from '@mui/icons-material/StarTwoTone';
-import AnimationTwoToneIcon from '@mui/icons-material/AnimationTwoTone';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import { withRouter, useHistory } from 'react-router-dom';
 
 // import { useStyles } from '../../style_jsx/styles';
 import { Menu, Dropdown, message, Space, Avatar, Typography, PageHeader, AutoComplete } from 'antd';
 import { DownOutlined, SettingOutlined, LogoutOutlined, PushpinTwoTone,
-  GiftOutlined } from '@ant-design/icons';
+  GiftOutlined, SearchOutlined } from '@ant-design/icons';
 import { context } from '../../store/store';
-import './chat.scss';
-import 'antd/dist/antd.css';
 import APICallManager from '../../services/api_manager';
 import config from '../../config.json';
+import {useSelector, useDispatch} from 'react-redux';
+import { setFriend } from '../../features/friendSlice';
+import { logout } from '../../features/userSlice';
+import './chat.scss';
+import 'antd/dist/antd.css';
+import { Badge, Tab } from '@mui/material';
 
 const { Text } = Typography;
 const SERVER = config.wsServer;
 
 const ChatDashboard = (props) => {
   const [options, setOptions] = useState([]);
-  const { state, dispatch } = useContext(context);
-  const { children, active } = props;
+  const { state: storeState } = useContext(context);
+  const user_Data = useSelector(state => state.user.value);
+  const notification = useSelector(state => state.notification);
+  const dispatch = useDispatch();
+  const { children } = props;
   const history = useHistory();
   //classes = useStyles();
 
   const handleMenuClick = (e) => {
-    e.key === '3' && message.info('User successfully logged out.');
+    e.key === '3' && message.info({content: 'User successfully logged out.', duration: 1});
     if (e.key === '3') {
-      dispatch({ type: 'LOGOUT' });
-      history.push('/home');
+      dispatch(logout());
+      history.push('/login');
       //window.location.reload();
     }
   };
@@ -61,7 +66,7 @@ const ChatDashboard = (props) => {
     });
 
     socket?.on('getUser', dataFromServer => {
-      if (dataFromServer.user !== state.userData.username && dataFromServer.user !== '') {
+      if (dataFromServer.user !== user_Data.username && dataFromServer.user !== '') {
         setOptions([{ value: dataFromServer.user, _id: dataFromServer._id }]);
       }
     });
@@ -69,8 +74,8 @@ const ChatDashboard = (props) => {
 
   const onSearch = (searchText) => {
     if (searchText.length > 0) {
-      if (state.userData.username !== searchText) {
-        socket.emit('getUser', { searchText: searchText, user: { ...state.userData } });
+      if (user_Data.username !== searchText) {
+        socket.emit('getUser', { searchText: searchText, user: { ...user_Data } });
       }
     }
     else {
@@ -80,15 +85,15 @@ const ChatDashboard = (props) => {
 
   const onSelect = (userData) => {
     const friend = {
-      clientId: state.userData._id,
+      clientId: user_Data._id,
       username: userData,
       userId: options[0]._id,
       chats: [],
     };
-    const obj = { url: state.config.baseUrl + state.config.addContact };
+    const obj = { url: storeState.config.baseUrl + storeState.config.addContact };
     const data = { ...friend };
     APICallManager.postCall(obj, data, async (res) => {
-      dispatch({ type: 'ADD_FRIEND', payload: { ...res.data } });
+      dispatch(setFriend([...res.data]));
       history.push({
         pathname: '/chat/' + userData,
         from: 'chatDashboard',
@@ -96,64 +101,44 @@ const ChatDashboard = (props) => {
     });
   };
 
-  const routeActivePage = (activeClass) => {
-    history.push(activeClass);
-  };
-
+  console.log(notification);
   return (
     <Box className="main-chat" id="wrapper">
-      {/* {state.userData.isLoggedIn && */}
-      <Box className="d-flex flex-column w-100">
-        <PageHeader className="main-chat__header title">
-          <Box>
-            <Avatar style={{ color: '#f56a00', backgroundColor: 'plum', border: '1px solid purple' }}>
-              {state.userData.username && state.userData.username[0].toUpperCase() || 'U'}
-            </Avatar>
-            <Text id="main-heading" type="secondary" className="ms-3"
-              style={{ fontSize: '24px', textTransform: 'capitalize' }}>
-              {state.userData.username}
-            </Text>
-          </Box>
-          <AutoComplete
-            className="w-50"
-            placeholder="Enter an user name to search and add in your contacts"
-            onSelect={onSelect}
-            onSearch={onSearch}
-            onBlur={() => setOptions([])}
-            options={options} />
-          <Space wrap className="mb-3">
-            <Dropdown overlay={menu}>
-              <Button>
-                Menu <DownOutlined className="ms-2 mt-1" />
-              </Button>
-            </Dropdown>
-          </Space>
-        </PageHeader>
-        <Box className="d-flex h-100">
-          <Box className="main-chat__sidebar">
-            <Box className={`p-3 icon ${active === 'contacts' && 'main-chat__active'}`}
-              onClick={() => routeActivePage('/contacts')}>
-              <PeopleAltTwoToneIcon title="Contacts" />
-            </Box>
-            <Box className={`p-3 icon ${active === 'chats' && 'main-chat__active'}`}
-              onClick={() => routeActivePage('/chats')}>
-              <ChatTwoToneIcon title="Recent Chat" />
-            </Box>
-            <Box className={`p-3 icon ${active === 'favourites' && 'main-chat__active'}`}
-              onClick={() => routeActivePage('/favourites')}>
-              <StarTwoToneIcon title="Favourites" />
-            </Box>
-            <Box className={`p-3 icon ${active === 'pinnedMessages' && 'main-chat__active'}`}
-              onClick={() => routeActivePage('/pinnedMessages')}>
-              <PushpinTwoTone title="Pinned Messages" size="2" twoToneColor="rgb(128, 0, 128)" />
-            </Box>
-            <Box className={`p-3 icon ${active === `status/id` && 'main-chat__active'}`}
-              onClick={() => routeActivePage(`status/id`)}>
-              <AnimationTwoToneIcon title="Status" />
-            </Box>
-          </Box>
-          {children}
-        </Box>
+      <PageHeader className="main-chat__header title">
+          <Button id="main-heading" type="secondary" className="ms-3 mb-3"
+            style={{ fontSize: '24px', textTransform: 'capitalize' }}>
+            <SearchOutlined className="me-2" size={40} style={{fontSize:18, fontWeight:700}}/>
+            <span style={{fontSize: 16}}>Search User</span>
+
+          </Button>
+        <AutoComplete
+          className="w-50"
+          placeholder="Enter an user name to search and add in your contacts"
+          onSelect={onSelect}
+          onSearch={onSearch}
+          onBlur={() => setOptions([])}
+          options={options} />
+           <Text  id="main-heading" type="secondary" className="ms-3 mb-3"
+            style={{ fontSize: '24px', textTransform: 'capitalize', color:'black' }}>
+            ChatBot!
+          </Text>
+        <Space wrap className="mb-3">
+          <Badge badgeContent={Object.values(notification[0]).every(x => (x === null || x === '')) ? 0 :
+          notification.length}
+          color="success" className="mt-2 mr-3">
+            <NotificationsIcon style={{ cursor: 'pointer' }}/>
+          </Badge>
+          <Dropdown overlay={menu}>
+            <Button>
+            <Avatar style={{ color: '#000', backgroundColor: 'rgb(185, 245, 208)', border: '1px solid darkgreen' }}>
+            {user_Data.username && user_Data.username[0].toUpperCase() || 'U'}
+          </Avatar> <DownOutlined className="ms-2" />
+            </Button>
+          </Dropdown>
+        </Space>
+      </PageHeader>
+      <Box className="d-flex h-100">
+        {children}
       </Box>
       {/* } */}
     </Box>

@@ -24,7 +24,7 @@ const sendEmail = async (email, subject, link) => {
       <a href=${link}>Click here to verify</a><br><br>
       Please check mail in junk box if you not find in inbox.`,
     });
-    console.log("email sent sucessfully");
+    console.log("email sent successfully");
   } catch (error) {
     console.log("email not sent");
     console.log(error);

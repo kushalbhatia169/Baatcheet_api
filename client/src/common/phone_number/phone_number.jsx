@@ -11,7 +11,7 @@ const PhoneNumber = (props) => {
     <MuiPhoneNumber
       id="outlined"
       InputProps={{
-        className: `${classes.input} mt-4`,
+        className: `${classes.input}`,
         classes: {
           notchedOutline: inputRef ? classes.notchedOutline : null,
           focused: classes.focused,
@@ -38,11 +38,11 @@ const PhoneNumber = (props) => {
       onChange={(phone) => setValue(`${name}`, phone)}
       minLength="15"
       onBlur={required && phone_Number_Check}
-      error={required && Boolean(phoneError)}
-      helperText= {required && phoneError &&
-                <Box style={{ marginLeft: '-1rem', fontSize: '13px', color: 'red' }} component="span">
-                  *Phone Number is rquired.
-                </Box>}
+      // error={required && Boolean(phoneError)}
+      // helperText= {required && phoneError &&
+      //           <Box style={{ marginLeft: '-1rem', fontSize: '13px', color: 'red' }} component="span">
+      //             *Phone Number is rquired.
+      //           </Box>}
       rules={{ minLength: 15 }}
     />
   );

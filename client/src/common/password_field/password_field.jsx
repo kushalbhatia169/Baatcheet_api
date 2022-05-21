@@ -14,7 +14,7 @@ const PasswordField = (props) => {
     <TextField {...
       {
         InputProps: {
-          className: `${classes.input} mt-4`,
+          className: `${classes.input}`,
           endAdornment: (
             <InputAdornment position="end">
               {showPassword ? <VisibilityIcon className={classes.show_hide_password}
@@ -42,13 +42,13 @@ const PasswordField = (props) => {
         autoComplete,
         variant: 'outlined',
         ...register(name, { onChange: (e) => setValue(name, e.target.value),
-          required: true, maxLength: 30, validate,
+          // required: false, maxLength: 30, validate,
         }),
-        error: Boolean(errors && errors[name]),
-        helperText: errors && errors[name] && <Box style={{ 'marginLeft': '-1rem', color: 'red' }} component="span"
-          className="text-capitalize">
-          *{validate && errorCheckPassword(errors[name].type) || 'password is required'}
-        </Box>,
+        // error: Boolean(errors && errors[name]),
+        // helperText: errors && errors[name] && <Box style={{ 'marginLeft': '-1rem', color: 'red' }} component="span"
+        //   className="text-capitalize">
+        //   *{validate && errorCheckPassword(errors[name].type) || 'password is required'}
+        // </Box>,
       }
     } /></Box>
   );

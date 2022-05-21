@@ -11,14 +11,14 @@ const Logo = ({ module_name }) => {
         <div className={`d-flex justify-content-center content__logo
          ${(module === 'Login' || module === 'Register')
          && 'content__logo--module'}`}>
-          <span className="heading logo">Baat</span>
-          <span className="heading logo">Cheet</span>
+          <span className="heading logo">Chat</span>
+          <span className="heading logo">Bot</span>
           <span className="heading logo">!</span>
         </div>
       </Box>
-      <h2 className="content__text heading">Lo Karlo Baat
-        <span role="img" aria-label="" className="mb-2 fs-1">🗣️</span>
-      </h2>
+      {/* <h2 className="content__text heading">Lo Karlo Baat
+        <span role="img" aria-label="" className="mb-2 fs-1" style={{color:'#fff'}}>🗣️</span>
+      </h2> */}
     </Box>
   );
 };

@@ -1,13 +1,12 @@
 import React, { useReducer, createContext } from 'react';
-import routesUrl from '../router/routes_url.json';
 import Reducer from './reducer';
 import config from '../config.json';
 import { getValue } from '../common/data_storage';
 
 const initialState = {
   userData: getValue('userData') || '',
-  routesUrl,
   config,
+  notifications: [],
 };
 
 export const context = createContext(initialState);

@@ -19,13 +19,42 @@
   .welcome-head {
     $self: &;
     height: 70px;
-    background: snow;
+    // background: white;
     border-bottom: 1px solid lightgray;
     z-index: 1;
 
     &__link {
+      display: flex;
+      -webkit-box-pack: start;
+      justify-content: flex-start;
+      flex-direction: row;
+      margin-bottom: 1em;
+
+      &--header {
+        width: 40%;
+        // background-color: #fff;
+      }
+
       &__list {
         font-size: 16px;
+        outline: transparent solid 2px;
+        outline-offset: 2px;
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        justify-content: center;
+        flex: 1 1 0%;
+        transition: all 0.2s ease 0s;
+        font-size: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+
+        &--active {
+          color: rgb(44, 82, 130);
+          background: rgb(190, 227, 248);
+          border-radius: 9999px;
+        }
 
         &:hover {
           cursor: pointer;
@@ -35,15 +64,25 @@
   }
 
   .welcome-logo {
+    display: flex;
+    -webkit-box-pack: center;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background: #fff;
+    width: 40%;
+    margin: 40px 0px 15px;
+    border-radius: 2.5%;
+    border-width: 1px;
+
     .content {
       $self: &;
-      height: 100px;
 
       &__logo {
         $self: &;
 
         span {
-          font-size: 72px;
+          font-size: 36px;
           display: inline;
           animation-delay: 2s;
 
@@ -70,12 +109,13 @@
 
         }
 
-        @include animateLogo(span1, 150px);
-        @include animateLogo(span2, 190px)
+        @include animateLogo(span1, 75px);
+        @include animateLogo(span2, 55px)
       }
 
       &__text {
         font-size: 26px;
+        margin-left: 20px;
       }
     }
   }
@@ -92,7 +132,6 @@
           color: $text;
         }
       }
-
 
       .p_box {
         border-right: 3px solid $borderColor

@@ -22,6 +22,12 @@
   font-family: "Roboto", sans-serif;
 }
 
+body {
+  background-image: url('/images/background2.webp');
+  background-repeat: inherit;
+  background-size: cover;
+}
+
 .heading {
   color: $heading !important;
   font-weight: 500;
@@ -82,4 +88,8 @@
     background: #e6e6e6;
     border-color: $heading;
   }
+}
+
+.MuiFormLabel-asterisk {
+  color: #db3131;
 }

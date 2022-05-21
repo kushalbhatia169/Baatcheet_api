@@ -2,7 +2,6 @@ import React from 'react';
 import { componentsModules } from '../components/index';
 import history from './history';
 import { BrowserRouter, Switch, Route, HashRouter, Redirect } from 'react-router-dom';
-import Footer from '../components/footer/footer';
 
 const Router = () => {
   // const isLogin = false;
@@ -17,15 +16,14 @@ const Router = () => {
               return (
                 // isLogin ?
                 //   <Redirect to="/dashboard" /> :
-                <Redirect to="/home" />
+                <Redirect to="/login" />
               );
             }}
           />
-          <Route exect path="/home" component={componentsModules['Home']} />
           <Route exect path="/login" component={componentsModules['Login']} />
           <Route exect path="/register" component={componentsModules['Register']} />
-          <Route exect path="/contacts" component={componentsModules['Contacts']} />
-          <Route exect path="/chats" component={componentsModules['Chat']} />
+          {/* <Route exect path="/contacts" component={componentsModules['Contacts']} /> */}
+          <Route exect path="/chats" component={componentsModules['ChatHome']} />
           <Route exect path="/chat/:id" component={componentsModules['Chat']} />
           <Route exect path="/favourites" component={componentsModules['Favourites']} />
           <Route exect path="/pinnedMessages" component={componentsModules['Pinned']} />
@@ -36,14 +34,13 @@ const Router = () => {
           </Route>
         </Switch>
       </HashRouter>
-    </BrowserRouter>
-    <Footer /></>
+    </BrowserRouter></>
   );
 };
 
 const NoMatch = () => {
   return (
-    <Redirect to="/home" />
+    <Redirect to="/login" />
   );
 };
 export default Router;

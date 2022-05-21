@@ -10,7 +10,7 @@ const withWelcome = (Module, module_name) => {
   const Welcome = ({ ...props }) => {
     const { location: { from } } = props;
 
-    return <Box className="d-flex flex-column flex-wrap welcome-main">
+    return <Box className="d-flex flex-column flex-wrap welcome-main w-100">
       <Module {...{
         Header: <><Header {...{ module_name, from }} /></>,
         Logo: <><Logo {...{ module_name, from }} /></>,

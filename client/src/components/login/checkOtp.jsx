@@ -1,16 +1,52 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useContext } from 'react';
 import { Box, Button } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import TextFieldsComponent from '../../common/text_field/text_field';
 import { useStyles } from '../../style_jsx/styles';
+import { context } from '../../store/store';
+import APICallManager from '../../services/api_manager';
+import { useHistory } from 'react-router';
+import { showMessage } from '../../common/showMessages';
+import { useSelector } from 'react-redux';
 
 const Checkotp = (props) => {
   const classes = useStyles(),
-        { otp, setOtp, onSubmitOTP } = props,
+        { setIsOtp, setCaptchaContainer } = props,
+        { state } = useContext(context),
+        userData = useSelector(state => state.user.value),
+        history = useHistory(),
+        [otp, setOtp] = useState({
+          '1': '',
+          '2': '',
+          '3': '',
+          '4': '',
+          '5': '',
+          '6': '',
+        }),
         { register, formState: { errors }, handleSubmit } = useForm({ reValidateMode: 'onBlur' }),
         setOtpData = useCallback(async (stateName, value) => {
           setOtp((prevState) => ({ ...prevState, [stateName]: value.replace(/\D+/g, '') }));
         }, []);
+
+  const onSubmitOTP = (/* e */) => {
+    //e.preventDefault();
+    const code = Object.keys(otp).map(key => otp[key]).join('');
+    window.confirmationResult.confirm(code).then((result) => {
+      // User signed in successfully.
+      const { phoneNumber } = result.user;
+      const isCallbackCall = true;
+      const obj = { url: state.config.baseUrl + state.config.verifyPhone + userData._id };
+      const data = { phoneVerified: true };
+      APICallManager.putCall(obj, data, async () => {
+        phoneNumber && showMessage(`${phoneNumber} is verified.`, isCallbackCall, 'success', setIsOtp, setCaptchaContainer, history );
+      });
+
+      // ...
+    }).catch((error) => {
+      // User couldn't sign in (bad verification code?)
+      showMessage(error, null, 'error', setIsOtp, setCaptchaContainer, history );
+    });
+  };
 
   return (
     <Box className="d-flex align-items-center flex-column">

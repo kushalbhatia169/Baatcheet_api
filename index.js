@@ -6,8 +6,8 @@ const GetSingleUserByName = require('./controllers/GetSingleUserByName');
 const SaveMessage = require('./controllers/SaveMessage');
 require('dotenv').config();   //to read the .env file
 const app = express(),
-db = require('./models/index');
-      port = process.env.PORT || 3000;
+  db = require('./models/index');
+port = process.env.PORT || 3000;
 // require('dotenv').config({path: __dirname + '/.env'});
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
@@ -19,7 +19,7 @@ const io = require('socket.io')(server, {
   }
 });
 
-server.listen(port, ()=>{
+server.listen(port, () => {
   console.log(`Socket Server listening on the port::8080`);
 });
 
@@ -42,25 +42,27 @@ io.on('connection', (socket) => {
         recieverId: clientData.recieverId,
       }
       await saveMsg.saveMessage(messageData)
-        .then((id)=>{
+        .then((id) => {
           console.log(id)
-          io.emit('chat message', { msgId: id, message: clientData.msg, user: clientData.user,  
-            senderId: clientData.senderId, recieverId: clientData.recieverId });
+          io.emit('chat message', {
+            msgId: id, message: clientData.msg, user: clientData.user,
+            senderId: clientData.senderId, recieverId: clientData.recieverId
+          });
         })
-        .catch((err)=>{
+        .catch((err) => {
           throw new Error(err);
         });
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
   });
 
-  socket.on('getUser', async(clientData) => {
-    if(clientData?.user?.username){
+  socket.on('getUser', async (clientData) => {
+    if (clientData?.user?.username) {
       const getUserInfo = new GetSingleUserByName();
       try {
         const user = await getUserInfo.getUserByName(clientData?.searchText);
-        user && io.emit('getUser', {user: user.username, _id: user._id});
+        user && io.emit('getUser', { user: user.username, _id: user._id });
       } catch (error) {
         console.log(error);
       }

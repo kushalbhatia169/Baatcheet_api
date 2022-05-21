@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useContext, useRef, createRef } from 'react';
 import io from 'socket.io-client';
-import { Box, Button } from '@mui/material';
-import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import Box from '@mui/material/Box';
 import { withRouter } from 'react-router-dom';
 // import { useStyles } from '../../style_jsx/styles';
-import { Card, Avatar, Input, Typography, message } from 'antd';
+import { Card, Avatar, Input, Typography, message, Spin } from 'antd';
 import { context } from '../../store/store';
 import ChatDashboard from './chat_dashboard';
 import APICallManager from '../../services/api_manager';
 import config from '../../config.json';
+import Contacts from './contacts';
+import usePrevious from '../../hooks/usePrevious';
+import { useSelector, useDispatch } from 'react-redux';
+import { setNotification } from '../../features/notificationSlice';
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -16,108 +19,166 @@ const { Meta } = Card;
 //const client = new W3CWebSocket('ws://127.0.0.1:8000');
 // const SERVER = 'ws://127.0.0.1:8080';
 const SERVER = config.wsServer;
-
+ let socket = null;
 
 const Chat = (props) => {
   // console.log('chat props', props);
   const [chatState, setChatState] = useState({
     messages: [],
   });
-  const { match: { params: { id } }, location: { from } } = props;
-  const { state/* , dispatch */ } = useContext(context);
-  const [socket, setSocket] = useState(null);
+  const { match: { params: { id: userId } }, location: { from, username: id, friend_Id } } = props;
+  const { state: storeState, dispatch: dispatchContext } = useContext(context);
+  const user_Data = useSelector(state => state.user.value);
+  const dispatch = useDispatch();
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [canShowLoader, setCanShowLoader] = useState(true);
   const messageRef = useRef(createRef());
-
+  let prevUserId = usePrevious({userId, id});
+// console.log(userId, id, canShowLoader, from, prevUserId);
   const onButtonClicked = (value) => {
-    if (!value) {
-      message.error('Please enter a message');
+    console.log(value)
+    if (!value.trim()) {
+      message.error({content: 'Please enter a message', duration: 2});
       return;
     }
-    const friend = state.friends.find(friend => friend.username === id);
-    socket.emit('chat message', {
-      msg: value,
-      user: state.userData.username,
-      senderId: state.userData._id,
-      recieverId: friend.userId,
-      isRead: false,
-    });
-    setChatState(prevState => ({ ...prevState, searchVal: '' }));
-  };
-
-  const scrollIntoView = () => {
-    messageRef.current.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    setSocket(io(SERVER));
-    if (from === 'chatDashboard') {
-      const friend = state.friends.find(friend => friend.username === id);
-      const obj = { url: state.config.baseUrl + state.config.getChats };
-      const data = { clientId: state.userData._id, userId: friend.userId };
-      APICallManager.postCall(obj, data, async (res) => {
-        const { data } = res;
-        data.map((dataFromServer) => {
+    else {
+      try {
+        const obj = {url: storeState.config.baseUrl + '/setMessages' };
+        const data = { senderId: user_Data._id, recieverId: friend_Id, message: value?.trim(), isRead: false };
+        APICallManager.putCall(obj, data, (res) => {
+          const { data } = res;
+          console.log(data);
+          socket.emit('new message', {
+            message: data.message,
+            user: user_Data.username,
+            id: data.msgId,
+            senderId: data.senderId,
+            recieverId: data.recieverId,
+            isRead: data.isRead,
+            roomId: data.recieverId+'|'+data.senderId,
+            chatId: data.chatId,
+          });
+          setChatState(prevState => ({ ...prevState, searchVal: '' }));
           setChatState(prevState => ({ ...prevState, messages: [
             ...prevState.messages,
             {
-              id: dataFromServer.chats._id,
-              msg: dataFromServer.chats.msg,
-              user: dataFromServer.senderId === state.userData._id ? state.userData.username : id,
-              senderId: dataFromServer.senderId,
-              recieverId: dataFromServer.recieverId,
-              isRead: dataFromServer.isRead,
+              id: data.msgId,
+              msg: data.message,
+              user: data.senderId === user_Data._id ? user_Data.username : id,
+              senderId: data.senderId,
+              recieverId: data.recieverId,
+              isRead: data.isRead,
             },
           ] }));
+          scrollIntoView();
+          })
+      }
+      catch (error) {
+        message.error({content: 'Failed to send the Message', duration: 2});
+      }
+    }
+  };
+
+  const scrollIntoView = () => {
+    messageRef?.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    if(prevUserId !== userId) {
+      setCanShowLoader(true);
+      prevUserId = userId;
+    }
+  },[userId]);
+
+  useEffect(() => {
+    // setSocket(io(SERVER));
+    socket = io(SERVER);
+    socket.emit("setup", user_Data?._id);
+    socket.on("connected", () => setSocketConnected(true));
+    if (from === 'chatDashboard' && canShowLoader) {
+      const obj = { url: storeState.config.baseUrl + storeState.config.getChats };
+      const data = { clientId: user_Data._id, userId: friend_Id };
+      APICallManager.postCall(obj, data, async (res) => {
+        const { data } = res;
+        const chatData = [];
+        data.map((dataFromServer) => {
+          chatData.push({
+            id: dataFromServer.chats._id,
+            msg: dataFromServer.chats.msg,
+            user: dataFromServer.senderId === user_Data._id ? user_Data.username : id,
+            senderId: dataFromServer.senderId,
+            recieverId: dataFromServer.recieverId,
+            isRead: dataFromServer.isRead,
+          });
         });
+        setChatState(prevState => ({ ...prevState, messages: [ ...chatData ] }));
+        let room_Id = user_Data._id+'|'+friend_Id;
+        socket.emit("join chat", room_Id);
+        setCanShowLoader(false);
         scrollIntoView();
       });
     }
-  }, []);
+  }, [canShowLoader]);
 
   useEffect(() => {
-    socket?.on('message', message => {
-      // eslint-disable-next-line no-console
-      console.log(message);
-    });
-
-    socket?.on('chat message', dataFromServer => {
-      setChatState(prevState => ({ ...prevState, messages: [
-        ...prevState.messages,
-        {
+    // socket?.on('message', message => {
+    //   // eslint-disable-next-line no-console
+    //   console.log(message);
+    // });
+    socket?.on('message received', dataFromServer => {
+      console.log(userId, dataFromServer.chatId, dataFromServer, window.location.href);
+      if(window.location.href.indexOf(dataFromServer.chatId) === -1) {
+        dispatch(setNotification({
           id: dataFromServer.msgId,
           msg: dataFromServer.message,
           user: dataFromServer.user,
           senderId: dataFromServer.senderId,
           recieverId: dataFromServer.recieverId,
           isRead: dataFromServer.isRead,
-        },
-      ] }));
+        }));
+        return;
+      }
+      else {
+        setChatState(prevState => ({ ...prevState, messages: [
+          ...prevState.messages,
+          {
+            id: dataFromServer.msgId,
+            msg: dataFromServer.message,
+            user: dataFromServer.user,
+            senderId: dataFromServer.senderId,
+            recieverId: dataFromServer.recieverId,
+            isRead: dataFromServer.isRead,
+          },
+        ] }));
+      }
+
+      // scrollIntoView();
     });
-  }, [socket]);
+
+  }, []);
 
   return (
     <ChatDashboard active="chats">
-      <Box className="w-100 ms-3 mt-3 h-100">
-        <Box className="me-5" style={{ borderBottom: '1px solid #e6e6e6' }}>
-          {state.friends && state.friends.map(friend => {
-            if (friend.username === id) {
-              return <Text id="main-heading" type="secondary" className="ms-3"
-                style={{ fontSize: '30px', textTransform: 'capitalize' }}>
-                {friend.username}
-              </Text>;
-            }
-          })}
+      <Contacts userId={userId}/>
+      <Box className="m-3 main-chat__chats">
+        <Box className="d-flex justify-content-start w-100 mb-3 mt-2">
+          <Text id="main-heading" type="secondary" className="ms-3" key={id}
+            style={{ fontSize: '30px', textTransform: 'capitalize' }}>
+            {id}
+          </Text>
         </Box>
-        <Box style={{ display: 'flex', flexDirection: 'column', paddingBottom: 50 }} id="messages"
+        {!canShowLoader ? <Box id="messages"
           className="w-100 main-chat__chatBox">
-          {chatState.messages && chatState.messages.map(message =>
-            <Card ref={messageRef[id]} key={message.id} style={{ width: 300, margin: '16px 16px 0 4px',
-              backgroundColor: state.userData.username === message.user ? '#f7f7f7' : '#fde3cf',
-              alignSelf: state.userData.username === message.user ? 'flex-end' : 'flex-start' }} loading={false}>
+          <Box className="w-100 main-chat__chatBox__messageDiv">
+            {chatState.messages && chatState.messages.map((message, key) =>
+            <Card ref={messageRef[id]} key={message.id || message+key} style={{ width: 300, margin: '16px 16px 0 16px',
+              backgroundColor: user_Data.username === message.user ? '#BEE3F8' : '#fde3cf',
+              alignSelf: user_Data.username === message.user ? 'flex-end' : 'flex-start',
+              borderRadius: '.5rem' }} loading={false}>
               <Meta
                 avatar={
                   <Avatar style={{ color: '#f56a00',
-                    backgroundColor: state.userData.username === message.user ? '#fde3cf' : '#f7f7f7' }}>
+                    backgroundColor: user_Data.username === message.user ? '#fde3cf' : '#BEE3F8' }}>
                     {message.user && message.user[0].toUpperCase() || 'U'}
                   </Avatar>
                 }
@@ -127,24 +188,36 @@ const Chat = (props) => {
             </Card>,
           )}
           <div ref={messageRef}></div>,
-        </Box>
-        <Box className="bottom d-flex justify-content-between p-3" style={{ bottom: 0 }}>
+          </Box>
           <TextArea
-            rows={3}
-            className="m-4 ms-3"
-            placeholder="Enter message"
+            rows={1}
+            className="m-2"
+            defaultValue={!chatState.searchVal ? '' : chatState.searchVal}
+            style={{backgroundColor: '#E0E0E0', width: '98%', borderRadius: '0.5rem'}}
+            placeholder="Enter a message"
             value={chatState.searchVal}
             size="large"
-            onChange={(e) => setChatState(prevState => ({ ...prevState, searchVal: e.target.value }))}
+            onChange={(e) => {
+              if (e.key === 'Enter') {
+                console.log('enter pressed');
+                setChatState(prevState => ({ ...prevState, searchVal: prevState.searchVal }));
+                return;
+              }
+              setChatState(prevState => ({ ...prevState, searchVal: e.target.value }))}
+            }
+            onKeyPress={event => {
+              if (event.key === 'Enter') {
+                console.log('enter pressed');
+                event.preventDefault();
+                onButtonClicked(chatState.searchVal);
+                return;
+              }
+            }}
           />
-          <Box className="d-flex flex-columns align-items-center">
-            <Button variant="outlined" className="send-button icon rounded-circle"
-              onClick={() => onButtonClicked(chatState.searchVal)}
-              title="Send">
-              <SendRoundedIcon />
-            </Button>
-          </Box>
-        </Box>
+        </Box>:
+        <div className="example">
+        <Spin />
+      </div>}
       </Box>
     </ChatDashboard>
   );
